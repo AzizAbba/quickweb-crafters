@@ -20,10 +20,10 @@ const Index = () => {
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 animate-fade-in">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                  {siteContent.heroTitle}
+                  {siteContent?.heroTitle || "Professional Websites, Delivered Fast"}
                 </h1>
                 <p className="text-xl mb-8 max-w-lg">
-                  {siteContent.heroSubtitle}
+                  {siteContent?.heroSubtitle || "We design modern, responsive, and SEO-optimized websites for businesses, individuals, and entrepreneurs."}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild size="lg" className="bg-white text-brand-blue hover:bg-gray-100">
@@ -63,7 +63,7 @@ const Index = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {services.map((service) => (
+              {(services || []).map((service) => (
                 <ServiceCard
                   key={service.id}
                   title={service.title}
@@ -92,7 +92,7 @@ const Index = () => {
               <div className="md:w-1/2 animate-fade-in">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">About QuickWeb Creations</h2>
                 <p className="text-lg text-gray-600 mb-6">
-                  {siteContent.aboutContent}
+                  {siteContent?.aboutContent || "QuickWeb Creations is a professional web development service that helps businesses, individuals, and entrepreneurs establish a strong online presence."}
                 </p>
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -133,7 +133,7 @@ const Index = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial) => (
+              {(testimonials || []).map((testimonial) => (
                 <TestimonialCard
                   key={testimonial.id}
                   name={testimonial.name}

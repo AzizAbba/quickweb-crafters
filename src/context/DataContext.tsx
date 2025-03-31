@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { UserWithPassword } from "@/types/auth";
 
@@ -64,6 +65,7 @@ interface DataContextType {
   updateUserStatus: (id: string, active: boolean) => void;
 }
 
+// Default values for the context
 const defaultServices: ServiceType[] = [
   {
     id: "service-1",
@@ -216,7 +218,22 @@ const defaultSiteContent: SiteContent = {
   aboutContent: "QuickWeb Creations is a professional web development service that helps businesses, individuals, and entrepreneurs establish a strong online presence. We design modern, responsive, and SEO-optimized websites with clean, high-quality code."
 };
 
-const DataContext = createContext<DataContextType | undefined>(undefined);
+// Create the context with default values to avoid undefined issues
+const DataContext = createContext<DataContextType>({
+  services: defaultServices,
+  testimonials: defaultTestimonials,
+  orders: defaultOrders,
+  messages: defaultMessages,
+  users: [],
+  siteContent: defaultSiteContent,
+  updateSiteContent: () => {},
+  addOrder: () => {},
+  updateOrderStatus: () => {},
+  addMessage: () => {},
+  markMessageAsRead: () => {},
+  updateService: () => {},
+  updateUserStatus: () => {},
+});
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [services, setServices] = useState<ServiceType[]>(defaultServices);
@@ -349,24 +366,24 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const contextValue: DataContextType = {
+    services,
+    testimonials,
+    orders,
+    messages,
+    users,
+    siteContent,
+    updateSiteContent,
+    addOrder,
+    updateOrderStatus,
+    addMessage,
+    markMessageAsRead,
+    updateService,
+    updateUserStatus,
+  };
+
   return (
-    <DataContext.Provider
-      value={{
-        services,
-        testimonials,
-        orders,
-        messages,
-        users,
-        siteContent,
-        updateSiteContent,
-        addOrder,
-        updateOrderStatus,
-        addMessage,
-        markMessageAsRead,
-        updateService,
-        updateUserStatus,
-      }}
-    >
+    <DataContext.Provider value={contextValue}>
       {children}
     </DataContext.Provider>
   );
@@ -374,7 +391,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useData = () => {
   const context = useContext(DataContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useData must be used within a DataProvider");
   }
   return context;
