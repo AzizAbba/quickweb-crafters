@@ -17,6 +17,7 @@ import ServiceEditor from "@/components/admin/ServiceEditor";
 import MessagesList from "@/components/admin/MessagesList";
 import FooterSocialEditor from "@/components/admin/FooterSocialEditor";
 import LegalEditor from "@/components/admin/LegalEditor";
+import PageEditor from "@/components/admin/PageEditor";
 import ImageUploader from "@/components/admin/ImageUploader";
 import {
   Select,
@@ -25,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X, Plus, Calendar, Mail, Phone, Info, User } from "lucide-react";
+import { X, Plus, Calendar, Mail, Phone, Info, User, Settings, Layout, Database, FileText } from "lucide-react";
 import { TeamMemberType } from "@/context/DataContext";
 
 const AdminDashboard = () => {
@@ -198,24 +199,196 @@ const AdminDashboard = () => {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-12">
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">Manage website content, orders, users and messages</p>
           </div>
 
-          <Tabs defaultValue="orders" className="space-y-8">
-            <TabsList className="grid w-full md:w-auto grid-cols-3 md:grid-cols-8 md:inline-flex">
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="home">Home</TabsTrigger>
-              <TabsTrigger value="about">About</TabsTrigger>
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="pricing">Pricing</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="messages">Messages</TabsTrigger>
+          <Tabs defaultValue="dashboard" className="space-y-8">
+            <TabsList className="grid w-full md:w-auto grid-cols-3 md:grid-cols-9 md:inline-flex">
+              <TabsTrigger value="dashboard" className="flex items-center gap-1">
+                <Layout className="h-4 w-4" />
+                <span className="hidden md:inline">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="pages">
+                <FileText className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">Pages</span>
+              </TabsTrigger>
+              <TabsTrigger value="orders">
+                <Database className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">Orders</span>
+              </TabsTrigger>
+              <TabsTrigger value="services">
+                <Settings className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">Services</span>
+              </TabsTrigger>
+              <TabsTrigger value="about">
+                <Info className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">About</span>
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                <User className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">Users</span>
+              </TabsTrigger>
+              <TabsTrigger value="messages">
+                <Mail className="h-4 w-4 md:mr-1" />
+                <span className="hidden md:inline">Messages</span>
+              </TabsTrigger>
+              <TabsTrigger value="social">
+                <svg className="h-4 w-4 md:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span className="hidden md:inline">Social</span>
+              </TabsTrigger>
+              <TabsTrigger value="legal">
+                <svg className="h-4 w-4 md:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span className="hidden md:inline">Legal</span>
+              </TabsTrigger>
             </TabsList>
+
+            {/* Dashboard Tab */}
+            <TabsContent value="dashboard" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl">{orders.length}</CardTitle>
+                    <CardDescription>Total Orders</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between">
+                        <span>Pending:</span>
+                        <span className="font-medium">{orders.filter(o => o.status === 'pending').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>In Progress:</span>
+                        <span className="font-medium">{orders.filter(o => o.status === 'in-progress').length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Completed:</span>
+                        <span className="font-medium">{orders.filter(o => o.status === 'completed').length}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl">{messages.length}</CardTitle>
+                    <CardDescription>Messages</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between">
+                        <span>Unread:</span>
+                        <span className="font-medium">{messages.filter(m => !m.isRead).length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Read:</span>
+                        <span className="font-medium">{messages.filter(m => m.isRead).length}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl">{services.length}</CardTitle>
+                    <CardDescription>Services</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm">
+                    Manage your services and pricing in the Services tab.
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-2xl">Quick Links</CardTitle>
+                    <CardDescription>Shortcuts</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2">
+                    <Button variant="outline" size="sm" className="justify-start">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Edit Homepage
+                    </Button>
+                    <Button variant="outline" size="sm" className="justify-start">
+                      <Mail className="h-4 w-4 mr-2" />
+                      View Messages
+                    </Button>
+                    <Button variant="outline" size="sm" className="justify-start">
+                      <User className="h-4 w-4 mr-2" />
+                      Manage Users
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Orders</CardTitle>
+                    <CardDescription>Latest 5 orders received</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {orders.slice(0, 5).map((order) => (
+                        <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
+                          <div>
+                            <div className="font-medium">{order.serviceType}</div>
+                            <div className="text-sm text-gray-600">{order.userName}</div>
+                          </div>
+                          <div className="flex items-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              order.status === "completed" ? "bg-green-100 text-green-800" :
+                              order.status === "in-progress" ? "bg-blue-100 text-blue-800" :
+                              order.status === "pending" ? "bg-yellow-100 text-yellow-800" : 
+                              "bg-red-100 text-red-800"
+                            }`}>
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Messages</CardTitle>
+                    <CardDescription>Latest 5 messages received</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {messages.slice(0, 5).map((message) => (
+                        <div key={message.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-md border border-gray-100">
+                          <div>
+                            <div className="font-medium">{message.subject}</div>
+                            <div className="text-sm text-gray-600">{message.name}</div>
+                          </div>
+                          <div className="flex items-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              message.isRead ? "bg-gray-100 text-gray-800" : "bg-blue-100 text-blue-800"
+                            }`}>
+                              {message.isRead ? "Read" : "Unread"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Pages Tab */}
+            <TabsContent value="pages">
+              <PageEditor />
+            </TabsContent>
 
             {/* Orders Tab */}
             <TabsContent value="orders" className="space-y-6">
@@ -348,78 +521,10 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Home Content Tab */}
-            <TabsContent value="home">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Home Page Content</CardTitle>
-                  <CardDescription>
-                    Update the content displayed on your home page
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="heroTitle">Hero Title</Label>
-                      <Input 
-                        id="heroTitle" 
-                        name="heroTitle" 
-                        value={content.heroTitle} 
-                        onChange={handleContentChange} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="heroSubtitle">Hero Subtitle</Label>
-                      <Textarea 
-                        id="heroSubtitle" 
-                        name="heroSubtitle" 
-                        value={content.heroSubtitle} 
-                        onChange={handleContentChange}
-                        rows={2} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Hero Image</Label>
-                      <ImageUploader 
-                        currentImage={content.heroImage}
-                        onImageUpload={(image) => handleImageUpload('heroImage', image)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="aboutContent">About Content (Home Page)</Label>
-                      <Textarea 
-                        id="aboutContent" 
-                        name="aboutContent" 
-                        value={content.aboutContent} 
-                        onChange={handleContentChange}
-                        rows={4} 
-                      />
-                    </div>
-
-                    <Button onClick={handleContentSave}>
-                      Save Changes
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <div className="mt-6">
-                <FooterSocialEditor 
-                  initialSocialLinks={footerLinks} 
-                  onSave={updateFooterLinks} 
-                />
-              </div>
-              
-              <div className="mt-6">
-                <LegalEditor 
-                  initialContent={legalContent} 
-                  onSave={updateLegalContent} 
-                />
-              </div>
+            
+            {/* Services Tab */}
+            <TabsContent value="services">
+              <ServiceEditor />
             </TabsContent>
             
             {/* About Content Tab */}
@@ -613,143 +718,8 @@ const AdminDashboard = () => {
                       </Card>
                     </div>
 
-                    <Button onClick={handleAboutSave}>
+                    <Button onClick={handleAboutSave} className="w-full">
                       Save All Changes
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Services Tab */}
-            <TabsContent value="services">
-              <ServiceEditor />
-            </TabsContent>
-            
-            {/* Pricing Tab */}
-            <TabsContent value="pricing">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pricing Page Content</CardTitle>
-                  <CardDescription>
-                    Update the content displayed on your pricing page
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="pricingTitle">Page Title</Label>
-                      <Input 
-                        id="pricingTitle" 
-                        name="pricingTitle" 
-                        value={content.pricingTitle || "Affordable Website Solutions"} 
-                        onChange={handleContentChange} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="pricingSubtitle">Page Subtitle</Label>
-                      <Textarea 
-                        id="pricingSubtitle" 
-                        name="pricingSubtitle" 
-                        value={content.pricingSubtitle || "Choose a plan that fits your needs"} 
-                        onChange={handleContentChange}
-                        rows={2} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="pricingDescription">Description</Label>
-                      <Textarea 
-                        id="pricingDescription" 
-                        name="pricingDescription" 
-                        value={content.pricingDescription || "All plans include hosting, domain registration, and ongoing support"} 
-                        onChange={handleContentChange}
-                        rows={3} 
-                      />
-                    </div>
-
-                    <p className="text-sm text-gray-500">
-                      Note: To manage pricing plans and features, please use the Services tab.
-                    </p>
-
-                    <Button onClick={handleContentSave}>
-                      Save Changes
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Contact Tab */}
-            <TabsContent value="contact">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Page Content</CardTitle>
-                  <CardDescription>
-                    Update the content displayed on your contact page
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactTitle">Page Title</Label>
-                      <Input 
-                        id="contactTitle" 
-                        name="contactTitle" 
-                        value={content.contactTitle || "Get in Touch"} 
-                        onChange={handleContentChange} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="contactSubtitle">Page Subtitle</Label>
-                      <Textarea 
-                        id="contactSubtitle" 
-                        name="contactSubtitle" 
-                        value={content.contactSubtitle || "Have questions or ready to start your project? Contact us today for a free consultation."} 
-                        onChange={handleContentChange}
-                        rows={2} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Contact Information</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="contactEmail">Email Address</Label>
-                          <Input 
-                            id="contactEmail" 
-                            name="contactEmail" 
-                            value={content.contactEmail || "azizabboud00@gmail.com"} 
-                            onChange={handleContentChange} 
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="contactPhone">Phone</Label>
-                          <Input 
-                            id="contactPhone" 
-                            name="contactPhone" 
-                            value={content.contactPhone || ""} 
-                            onChange={handleContentChange} 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="contactAddress">Office Address</Label>
-                      <Textarea 
-                        id="contactAddress" 
-                        name="contactAddress" 
-                        value={content.contactAddress || "Remote Team - Available Worldwide"} 
-                        onChange={handleContentChange}
-                        rows={2} 
-                      />
-                    </div>
-
-                    <Button onClick={handleContentSave}>
-                      Save Changes
                     </Button>
                   </div>
                 </CardContent>
@@ -764,6 +734,22 @@ const AdminDashboard = () => {
             {/* Messages Tab */}
             <TabsContent value="messages">
               <MessagesList />
+            </TabsContent>
+
+            {/* Social Tab */}
+            <TabsContent value="social">
+              <FooterSocialEditor 
+                initialSocialLinks={footerLinks} 
+                onSave={updateFooterLinks} 
+              />
+            </TabsContent>
+
+            {/* Legal Tab */}
+            <TabsContent value="legal">
+              <LegalEditor 
+                initialContent={legalContent} 
+                onSave={updateLegalContent} 
+              />
             </TabsContent>
           </Tabs>
         </div>

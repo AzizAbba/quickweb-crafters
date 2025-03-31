@@ -64,21 +64,21 @@ const SignInPage = () => {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">Welcome Back</h1>
+            <h1 className="text-3xl font-bold text-brand-blue">Welcome Back</h1>
             <p className="mt-2 text-gray-600">Sign in to your account</p>
           </div>
 
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-brand-blue/5 pb-6">
               <CardTitle>Sign In</CardTitle>
               <CardDescription>
                 Enter your credentials to access your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -89,6 +89,7 @@ const SignInPage = () => {
                     placeholder="example@email.com"
                     value={formData.email}
                     onChange={handleChange}
+                    className="border-gray-300"
                     required
                   />
                 </div>
@@ -109,6 +110,7 @@ const SignInPage = () => {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
+                    className="border-gray-300"
                     required
                   />
                 </div>
@@ -122,7 +124,7 @@ const SignInPage = () => {
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-center">
+            <CardFooter className="flex justify-center bg-gray-50 border-t">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
                 <Link to="/signup" className="font-medium text-brand-blue hover:underline">
@@ -131,12 +133,6 @@ const SignInPage = () => {
               </p>
             </CardFooter>
           </Card>
-
-          <div className="text-center text-sm text-gray-500">
-            <p>Admin credentials (for demo):</p>
-            <p>Email: admin@quickweb.com</p>
-            <p>Password: admin123</p>
-          </div>
         </div>
       </main>
       <Footer />

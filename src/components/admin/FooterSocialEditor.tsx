@@ -103,14 +103,14 @@ const FooterSocialEditor = ({ initialSocialLinks = {}, onSave }: FooterSocialEdi
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border border-gray-200 shadow-sm">
+      <CardHeader className="bg-brand-blue/5">
         <CardTitle>Social Media Links</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-4">
           {socialLinks.map((link, index) => (
-            <div key={index} className="flex items-center space-x-4">
+            <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 border border-gray-100">
               <Switch 
                 checked={link.enabled} 
                 onCheckedChange={(checked) => handleToggleChange(index, checked)} 
@@ -133,7 +133,7 @@ const FooterSocialEditor = ({ initialSocialLinks = {}, onSave }: FooterSocialEdi
             </div>
           ))}
           
-          <Button onClick={handleSaveLinks}>Save Social Links</Button>
+          <Button onClick={handleSaveLinks} className="w-full mt-2">Save Social Links</Button>
         </div>
       </CardContent>
     </Card>
