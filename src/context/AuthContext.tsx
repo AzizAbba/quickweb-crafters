@@ -2,10 +2,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 
+// Create a User interface that allows either role
 interface User {
   id: string;
   username: string;
   email: string;
+  role: "user" | "admin";
+}
+
+// Create a separate interface for users in the array that includes the password
+interface UserWithPassword {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
   role: "user" | "admin";
 }
 
@@ -20,20 +30,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Admin user credentials
-const adminUser = {
+const adminUser: UserWithPassword = {
   id: "admin-id",
   username: "admin",
   password: "admin123",
   email: "admin@quickweb.com",
-  role: "admin" as const,
+  role: "admin",
 };
 
-// Sample users array to simulate a database
-const initialUsers = [adminUser];
+// Sample users array to simulate a database - now properly typed to accept both user roles
+const initialUsers: UserWithPassword[] = [adminUser];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<UserWithPassword[]>(initialUsers);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     if (foundUser) {
-      const { password, ...userWithoutPassword } = foundUser;
+      const { password: _, ...userWithoutPassword } = foundUser;
       setUser(userWithoutPassword);
       localStorage.setItem("quickweb_user", JSON.stringify(userWithoutPassword));
       return true;
@@ -78,12 +88,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    const newUser = {
+    const newUser: UserWithPassword = {
       id: `user-${Date.now()}`,
       username,
       email,
       password,
-      role: "user" as const,
+      role: "user",
     };
 
     // Add user to "database"
