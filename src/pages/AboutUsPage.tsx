@@ -1,10 +1,13 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 
 const AboutUsPage = () => {
   const { aboutContent } = useData();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -130,7 +133,6 @@ const AboutUsPage = () => {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Button 
-                asChild 
                 size="lg" 
                 className="bg-brand-blue hover:bg-brand-blue/90"
                 onClick={() => navigate("/contact")}
@@ -138,7 +140,6 @@ const AboutUsPage = () => {
                 Contact Us
               </Button>
               <Button 
-                asChild 
                 size="lg" 
                 variant="outline" 
                 className="border-brand-blue text-brand-blue hover:bg-brand-blue/10"
