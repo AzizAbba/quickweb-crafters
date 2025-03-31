@@ -18,6 +18,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import OrderPage from "./pages/OrderPage";
 import AboutUsPage from "./pages/AboutUsPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsOfServicePage from "./pages/TermsOfServicePage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,8 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/order/:serviceId?" element={<OrderPage />} />
               <Route path="/about" element={<AboutUsPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms-of-service" element={<TermsOfServicePage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </DataProvider>

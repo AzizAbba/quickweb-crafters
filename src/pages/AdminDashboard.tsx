@@ -15,6 +15,9 @@ import Footer from "@/components/Footer";
 import UsersTable from "@/components/admin/UsersTable";
 import ServiceEditor from "@/components/admin/ServiceEditor";
 import MessagesList from "@/components/admin/MessagesList";
+import FooterSocialEditor from "@/components/admin/FooterSocialEditor";
+import LegalEditor from "@/components/admin/LegalEditor";
+import ImageUploader from "@/components/admin/ImageUploader";
 import {
   Select,
   SelectContent,
@@ -22,14 +25,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Calendar, Mail, Phone, Info, User } from "lucide-react";
 import { TeamMemberType } from "@/context/DataContext";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { orders, siteContent, aboutContent, updateSiteContent, updateAboutContent, updateOrderStatus, services, messages } = useData();
+  const { 
+    orders, 
+    siteContent, 
+    aboutContent, 
+    updateSiteContent, 
+    updateAboutContent, 
+    updateOrderStatus, 
+    services, 
+    messages,
+    updateFooterLinks,
+    updateLegalContent,
+    footerLinks,
+    legalContent
+  } = useData();
   
   const [content, setContent] = useState(siteContent);
   const [about, setAbout] = useState(aboutContent);
@@ -152,6 +168,29 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleImageUpload = (field: string, image: string) => {
+    setContent(prev => ({
+      ...prev,
+      [field]: image
+    }));
+  };
+
+  const handleTeamImageUpload = (index: number | null, image: string) => {
+    if (index === null) {
+      setNewTeamMember(prev => ({
+        ...prev,
+        image
+      }));
+    } else {
+      const updatedTeam = [...about.team];
+      updatedTeam[index].image = image;
+      setAbout(prev => ({
+        ...prev,
+        team: updatedTeam
+      }));
+    }
+  };
+
   if (!user || user.role !== "admin") {
     return null; // Don't render anything if not admin
   }
@@ -167,11 +206,13 @@ const AdminDashboard = () => {
           </div>
 
           <Tabs defaultValue="orders" className="space-y-8">
-            <TabsList className="grid w-full md:w-auto grid-cols-3 md:grid-cols-6 md:inline-flex">
+            <TabsList className="grid w-full md:w-auto grid-cols-3 md:grid-cols-8 md:inline-flex">
               <TabsTrigger value="orders">Orders</TabsTrigger>
               <TabsTrigger value="home">Home</TabsTrigger>
               <TabsTrigger value="about">About</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="pricing">Pricing</TabsTrigger>
+              <TabsTrigger value="contact">Contact</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
             </TabsList>
@@ -215,33 +256,54 @@ const AdminDashboard = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <h3 className="font-semibold text-lg mb-1">{order.serviceType}</h3>
-                                <p className="text-gray-500 text-sm">
+                                <div className="flex items-center text-gray-500 text-sm mb-1">
+                                  <Calendar className="h-4 w-4 mr-1" /> 
+                                  {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
+                                <p className="text-gray-500 text-sm mb-2">
                                   Order ID: {order.id}
                                 </p>
-                                <p className="text-gray-500 text-sm">
-                                  Date: {new Date(order.createdAt).toLocaleDateString()}
-                                </p>
+                                
                                 <div className="mt-4">
-                                  <h4 className="font-medium text-sm mb-1">Customer</h4>
-                                  <p>{order.userName}</p>
-                                  <p className="text-gray-500 text-sm">{order.userEmail}</p>
+                                  <h4 className="font-medium text-sm mb-1">Customer Details</h4>
+                                  <div className="space-y-1 mb-2">
+                                    <div className="flex items-center">
+                                      <User className="h-4 w-4 mr-2 text-gray-500" />
+                                      <p>{order.userName}</p>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                                      <p className="text-gray-700">{order.userEmail}</p>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <Info className="h-4 w-4 mr-2 text-gray-500" />
+                                      <p>User ID: {order.userId}</p>
+                                    </div>
+                                  </div>
                                 </div>
+                                
                                 {order.businessType && (
                                   <div className="mt-2">
                                     <h4 className="font-medium text-sm mb-1">Project Type</h4>
-                                    <p>{order.businessType}</p>
+                                    <p className="bg-gray-100 px-2 py-1 rounded text-gray-700 inline-block">{order.businessType}</p>
                                   </div>
                                 )}
                               </div>
                               <div>
                                 <div className="mb-4">
-                                  <h4 className="font-medium text-sm mb-1">Details</h4>
-                                  <p className="text-gray-600">{order.details}</p>
+                                  <h4 className="font-medium text-sm mb-1">Project Details</h4>
+                                  <p className="text-gray-600 bg-gray-50 p-3 rounded border">{order.details}</p>
                                 </div>
                                 {order.requirements && (
                                   <div className="mb-4">
-                                    <h4 className="font-medium text-sm mb-1">Requirements</h4>
-                                    <p className="text-gray-600">{order.requirements}</p>
+                                    <h4 className="font-medium text-sm mb-1">Specific Requirements</h4>
+                                    <p className="text-gray-600 bg-gray-50 p-3 rounded border">{order.requirements}</p>
                                   </div>
                                 )}
                                 <div>
@@ -253,7 +315,7 @@ const AdminDashboard = () => {
                                       value
                                     )}
                                   >
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                       <SelectValue placeholder="Status" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -263,6 +325,9 @@ const AdminDashboard = () => {
                                       <SelectItem value="cancelled">Cancelled</SelectItem>
                                     </SelectContent>
                                   </Select>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                  <Button size="sm">Contact Customer</Button>
                                 </div>
                               </div>
                             </div>
@@ -317,6 +382,14 @@ const AdminDashboard = () => {
                     </div>
                     
                     <div className="space-y-2">
+                      <Label>Hero Image</Label>
+                      <ImageUploader 
+                        currentImage={content.heroImage}
+                        onImageUpload={(image) => handleImageUpload('heroImage', image)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
                       <Label htmlFor="aboutContent">About Content (Home Page)</Label>
                       <Textarea 
                         id="aboutContent" 
@@ -333,6 +406,20 @@ const AdminDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+              
+              <div className="mt-6">
+                <FooterSocialEditor 
+                  initialSocialLinks={footerLinks} 
+                  onSave={updateFooterLinks} 
+                />
+              </div>
+              
+              <div className="mt-6">
+                <LegalEditor 
+                  initialContent={legalContent} 
+                  onSave={updateLegalContent} 
+                />
+              </div>
             </TabsContent>
             
             {/* About Content Tab */}
@@ -368,6 +455,16 @@ const AdminDashboard = () => {
                       />
                     </div>
                     
+                    <div>
+                      <Label>Team Image</Label>
+                      <div className="mt-2">
+                        <ImageUploader 
+                          currentImage={about.teamImage}
+                          onImageUpload={(image) => setAbout(prev => ({...prev, teamImage: image}))}
+                        />
+                      </div>
+                    </div>
+                    
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <Label>Team Members</Label>
@@ -379,14 +476,57 @@ const AdminDashboard = () => {
                             <CardContent className="p-4">
                               <div className="flex justify-between items-start">
                                 <div className="flex gap-4 items-center">
-                                  <img 
-                                    src={member.image} 
-                                    alt={member.name}
-                                    className="w-12 h-12 rounded-full object-cover" 
-                                  />
+                                  <div className="relative">
+                                    <img 
+                                      src={member.image} 
+                                      alt={member.name}
+                                      className="w-12 h-12 rounded-full object-cover" 
+                                    />
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="absolute bottom-0 -right-2"
+                                      onClick={() => {
+                                        // Trigger hidden file input
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = 'image/*';
+                                        input.onchange = (e) => {
+                                          const file = (e.target as HTMLInputElement).files?.[0];
+                                          if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = () => {
+                                              const result = reader.result as string;
+                                              handleTeamImageUpload(index, result);
+                                            };
+                                            reader.readAsDataURL(file);
+                                          }
+                                        };
+                                        input.click();
+                                      }}
+                                    >
+                                      Edit
+                                    </Button>
+                                  </div>
                                   <div>
-                                    <h4 className="font-semibold">{member.name}</h4>
-                                    <p className="text-sm text-gray-500">{member.role}</p>
+                                    <Input 
+                                      value={member.name}
+                                      onChange={(e) => {
+                                        const updatedTeam = [...about.team];
+                                        updatedTeam[index].name = e.target.value;
+                                        setAbout(prev => ({...prev, team: updatedTeam}));
+                                      }}
+                                      className="font-semibold mb-1"
+                                    />
+                                    <Input 
+                                      value={member.role}
+                                      onChange={(e) => {
+                                        const updatedTeam = [...about.team];
+                                        updatedTeam[index].role = e.target.value;
+                                        setAbout(prev => ({...prev, team: updatedTeam}));
+                                      }}
+                                      className="text-sm text-gray-500"
+                                    />
                                   </div>
                                 </div>
                                 <Button 
@@ -396,6 +536,18 @@ const AdminDashboard = () => {
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
+                              </div>
+                              <div className="mt-3">
+                                <Textarea 
+                                  value={member.bio}
+                                  onChange={(e) => {
+                                    const updatedTeam = [...about.team];
+                                    updatedTeam[index].bio = e.target.value;
+                                    setAbout(prev => ({...prev, team: updatedTeam}));
+                                  }}
+                                  rows={2}
+                                  className="text-sm"
+                                />
                               </div>
                             </CardContent>
                           </Card>
@@ -441,12 +593,11 @@ const AdminDashboard = () => {
                             </div>
                             
                             <div className="space-y-1">
-                              <Label htmlFor="memberImage">Image URL</Label>
-                              <Input 
-                                id="memberImage" 
-                                name="image" 
-                                value={newTeamMember.image} 
-                                onChange={handleTeamMemberChange} 
+                              <Label>Member Image</Label>
+                              <ImageUploader 
+                                currentImage={newTeamMember.image}
+                                onImageUpload={(image) => handleTeamImageUpload(null, image)}
+                                label="Upload Member Image"
                               />
                             </div>
                             
@@ -473,6 +624,136 @@ const AdminDashboard = () => {
             {/* Services Tab */}
             <TabsContent value="services">
               <ServiceEditor />
+            </TabsContent>
+            
+            {/* Pricing Tab */}
+            <TabsContent value="pricing">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pricing Page Content</CardTitle>
+                  <CardDescription>
+                    Update the content displayed on your pricing page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="pricingTitle">Page Title</Label>
+                      <Input 
+                        id="pricingTitle" 
+                        name="pricingTitle" 
+                        value={content.pricingTitle || "Affordable Website Solutions"} 
+                        onChange={handleContentChange} 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="pricingSubtitle">Page Subtitle</Label>
+                      <Textarea 
+                        id="pricingSubtitle" 
+                        name="pricingSubtitle" 
+                        value={content.pricingSubtitle || "Choose a plan that fits your needs"} 
+                        onChange={handleContentChange}
+                        rows={2} 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="pricingDescription">Description</Label>
+                      <Textarea 
+                        id="pricingDescription" 
+                        name="pricingDescription" 
+                        value={content.pricingDescription || "All plans include hosting, domain registration, and ongoing support"} 
+                        onChange={handleContentChange}
+                        rows={3} 
+                      />
+                    </div>
+
+                    <p className="text-sm text-gray-500">
+                      Note: To manage pricing plans and features, please use the Services tab.
+                    </p>
+
+                    <Button onClick={handleContentSave}>
+                      Save Changes
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Contact Tab */}
+            <TabsContent value="contact">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Page Content</CardTitle>
+                  <CardDescription>
+                    Update the content displayed on your contact page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="contactTitle">Page Title</Label>
+                      <Input 
+                        id="contactTitle" 
+                        name="contactTitle" 
+                        value={content.contactTitle || "Get in Touch"} 
+                        onChange={handleContentChange} 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="contactSubtitle">Page Subtitle</Label>
+                      <Textarea 
+                        id="contactSubtitle" 
+                        name="contactSubtitle" 
+                        value={content.contactSubtitle || "Have questions or ready to start your project? Contact us today for a free consultation."} 
+                        onChange={handleContentChange}
+                        rows={2} 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Contact Information</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="contactEmail">Email Address</Label>
+                          <Input 
+                            id="contactEmail" 
+                            name="contactEmail" 
+                            value={content.contactEmail || "azizabboud00@gmail.com"} 
+                            onChange={handleContentChange} 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="contactPhone">Phone</Label>
+                          <Input 
+                            id="contactPhone" 
+                            name="contactPhone" 
+                            value={content.contactPhone || ""} 
+                            onChange={handleContentChange} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="contactAddress">Office Address</Label>
+                      <Textarea 
+                        id="contactAddress" 
+                        name="contactAddress" 
+                        value={content.contactAddress || "Remote Team - Available Worldwide"} 
+                        onChange={handleContentChange}
+                        rows={2} 
+                      />
+                    </div>
+
+                    <Button onClick={handleContentSave}>
+                      Save Changes
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             {/* Users Tab */}

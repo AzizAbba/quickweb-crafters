@@ -11,7 +11,7 @@ import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Clock, Calendar } from "lucide-react";
 
 const OrderPage = () => {
   const { serviceId } = useParams();
@@ -24,7 +24,7 @@ const OrderPage = () => {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    businessType: "",
+    businessType: "Small Business",
     details: "",
     requirements: "",
   });
@@ -36,6 +36,7 @@ const OrderPage = () => {
       const service = services.find((s) => s.id === serviceId);
       if (service) {
         setSelectedService(service);
+        setStep(2);
       }
     }
   }, [serviceId, services]);
@@ -79,13 +80,15 @@ const OrderPage = () => {
         details: formData.details,
         businessType: formData.businessType,
         requirements: formData.requirements,
+        price: "Free", // Changed to free as requested
+        createdAt: new Date().toISOString(),
       });
       
       setStep(3);
       
       toast({
         title: "Order Submitted",
-        description: "Our team will contact you shortly via email.",
+        description: "Our team will contact you shortly via email to discuss your project and payment options.",
       });
     } catch (error) {
       toast({
@@ -103,6 +106,17 @@ const OrderPage = () => {
     setStep(2);
   };
 
+  const businessTypes = [
+    "Small Business",
+    "Standard Website", // Added standard website as requested
+    "Corporate",
+    "E-commerce",
+    "Portfolio",
+    "Blog",
+    "Non-profit",
+    "Educational"
+  ];
+
   return (
     <>
       <Navbar />
@@ -110,24 +124,35 @@ const OrderPage = () => {
         <div className="container mx-auto max-w-5xl">
           {/* Progress Steps */}
           <div className="mb-8">
-            <div className="flex justify-center items-center mb-6">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= 1 ? "bg-brand-blue text-white" : "bg-gray-200"} mr-2`}>
-                {step > 1 ? <Check className="h-4 w-4" /> : "1"}
+            <div className="relative">
+              <div className="flex justify-between items-center mb-6">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 1 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
+                  {step > 1 ? <Check className="h-5 w-5" /> : "1"}
+                </div>
+                <div className={`h-1 absolute top-5 left-10 right-1/2 -translate-x-5 ${step >= 2 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
+                <div className={`h-1 absolute top-5 left-1/2 right-10 translate-x-5 ${step >= 3 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 2 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
+                  {step > 2 ? <Check className="h-5 w-5" /> : "2"}
+                </div>
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 3 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
+                  {step > 3 ? <Check className="h-5 w-5" /> : "3"}
+                </div>
               </div>
-              <div className={`h-1 w-16 ${step >= 2 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= 2 ? "bg-brand-blue text-white" : "bg-gray-200"} mr-2`}>
-                {step > 2 ? <Check className="h-4 w-4" /> : "2"}
-              </div>
-              <div className={`h-1 w-16 ${step >= 3 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${step >= 3 ? "bg-brand-blue text-white" : "bg-gray-200"}`}>
-                {step > 3 ? <Check className="h-4 w-4" /> : "3"}
+              <div className="flex justify-between text-sm">
+                <div className={`w-20 text-center ${step >= 1 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Select Service</div>
+                <div className={`w-20 text-center ${step >= 2 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Project Details</div>
+                <div className={`w-20 text-center ${step >= 3 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Confirmation</div>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-center">
+            
+            <h2 className="text-2xl lg:text-3xl font-bold text-center mt-8">
               {step === 1 && "Select Your Service"}
               {step === 2 && "Project Details"}
               {step === 3 && "Order Confirmation"}
             </h2>
+            {step === 1 && (
+              <p className="text-center text-gray-600 mt-2">Choose the service that best fits your needs</p>
+            )}
           </div>
 
           {step === 1 && (
@@ -140,11 +165,24 @@ const OrderPage = () => {
                   }`}
                   onClick={() => handleServiceSelect(service)}
                 >
+                  {service.imageUrl && (
+                    <div className="h-40 w-full overflow-hidden">
+                      <img 
+                        src={service.imageUrl} 
+                        alt={service.title}
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
+                  )}
                   <CardHeader className="pb-2">
                     <CardTitle>{service.title}</CardTitle>
                     <CardDescription>{service.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <div className="flex items-center text-sm text-gray-500 mb-4">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Delivery: {service.deliveryTime}</span>
+                    </div>
                     <ul className="space-y-1">
                       {service.features.slice(0, 3).map((feature, index) => (
                         <li key={index} className="flex items-start">
@@ -152,10 +190,13 @@ const OrderPage = () => {
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}
+                      {service.features.length > 3 && (
+                        <li className="text-sm text-brand-blue">+ {service.features.length - 3} more features</li>
+                      )}
                     </ul>
                   </CardContent>
                   <CardFooter className="flex justify-between">
-                    <span className="text-lg font-bold text-brand-blue">{service.price}</span>
+                    <span className="text-lg font-bold text-brand-blue">Free</span>
                     <Button size="sm">Select</Button>
                   </CardFooter>
                 </Card>
@@ -197,13 +238,17 @@ const OrderPage = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="businessType">Business/Project Type</Label>
-                    <Input
+                    <select
                       id="businessType"
                       name="businessType"
-                      placeholder="E.g., E-commerce, Portfolio, Blog, etc."
                       value={formData.businessType}
-                      onChange={handleChange}
-                    />
+                      onChange={handleChange as any}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {businessTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">
@@ -211,7 +256,7 @@ const OrderPage = () => {
                     <Textarea
                       id="details"
                       name="details"
-                      placeholder="Describe your project needs and expectations"
+                      placeholder="Describe your project needs and expectations in detail"
                       rows={4}
                       value={formData.details}
                       onChange={handleChange}
@@ -220,26 +265,33 @@ const OrderPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="requirements">Specific Requirements (Optional)</Label>
+                    <Label htmlFor="requirements">Specific Requirements</Label>
                     <Textarea
                       id="requirements"
                       name="requirements"
-                      placeholder="Any specific features, design requirements, etc."
+                      placeholder="Any specific features, design requirements, technology preferences, etc."
                       rows={3}
                       value={formData.requirements}
                       onChange={handleChange}
                     />
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 p-4 rounded-lg border">
                     <div className="flex justify-between mb-2">
                       <span>Service:</span>
                       <span className="font-medium">{selectedService?.title}</span>
+                    </div>
+                    <div className="flex justify-between mb-2">
+                      <span>Price:</span>
+                      <span className="font-medium text-green-600">Free</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Estimated Delivery:</span>
                       <span className="font-medium">{selectedService?.deliveryTime}</span>
                     </div>
+                    <p className="mt-3 text-sm text-gray-500">
+                      Our team will contact you to discuss payment options after reviewing your project requirements.
+                    </p>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
@@ -261,24 +313,30 @@ const OrderPage = () => {
                   <Check className="h-8 w-8 text-green-600" />
                 </div>
                 <CardTitle className="text-2xl">Order Submitted Successfully!</CardTitle>
-                <CardDescription>Thank you for your order</CardDescription>
+                <CardDescription className="text-lg">Thank you for your order</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="mb-4">
+                <p className="mb-6 text-lg">
                   Our team will contact you shortly via email to discuss your project requirements and payment options.
                 </p>
-                <div className="bg-gray-50 p-4 rounded-lg max-w-md mx-auto">
-                  <div className="flex justify-between mb-2">
-                    <span>Order Reference:</span>
+                <div className="bg-gray-50 p-6 rounded-lg max-w-md mx-auto border">
+                  <div className="flex justify-between mb-4">
+                    <span className="font-medium">Order Reference:</span>
                     <span className="font-medium">{`ORD-${Date.now().toString().slice(-6)}`}</span>
                   </div>
-                  <div className="flex justify-between mb-2">
-                    <span>Service:</span>
-                    <span className="font-medium">{selectedService?.title}</span>
+                  <div className="flex justify-between mb-4">
+                    <span className="font-medium">Service:</span>
+                    <span>{selectedService?.title}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Estimated Contact:</span>
-                    <span className="font-medium">Within 24 hours</span>
+                  <div className="flex justify-between mb-4">
+                    <span className="font-medium">Business Type:</span>
+                    <span>{formData.businessType}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Expected Contact:</span>
+                    <span className="flex items-center text-brand-blue">
+                      <Calendar className="h-4 w-4 mr-1" /> Within 24 hours
+                    </span>
                   </div>
                 </div>
               </CardContent>

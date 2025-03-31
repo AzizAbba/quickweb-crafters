@@ -29,6 +29,7 @@ const Navbar = () => {
             <Link to="/" className="text-gray-700 hover:text-brand-blue px-3 py-2 text-sm font-medium">Home</Link>
             <Link to="/services" className="text-gray-700 hover:text-brand-blue px-3 py-2 text-sm font-medium">Services</Link>
             <Link to="/pricing" className="text-gray-700 hover:text-brand-blue px-3 py-2 text-sm font-medium">Pricing</Link>
+            <Link to="/about" className="text-gray-700 hover:text-brand-blue px-3 py-2 text-sm font-medium">About Us</Link>
             <Link to="/contact" className="text-gray-700 hover:text-brand-blue px-3 py-2 text-sm font-medium">Contact</Link>
             
             {user ? (
@@ -76,6 +77,7 @@ const Navbar = () => {
             <Link to="/" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium" onClick={toggleMenu}>Home</Link>
             <Link to="/services" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium" onClick={toggleMenu}>Services</Link>
             <Link to="/pricing" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium" onClick={toggleMenu}>Pricing</Link>
+            <Link to="/about" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium" onClick={toggleMenu}>About Us</Link>
             <Link to="/contact" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium" onClick={toggleMenu}>Contact</Link>
             
             {user ? (
