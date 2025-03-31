@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Image } from "lucide-react";
 
 const ServiceEditor = () => {
   const { services, updateService } = useData();
@@ -108,6 +108,15 @@ const ServiceEditor = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {services.map(service => (
                   <Card key={service.id} className="cursor-pointer hover:border-primary transition-colors" onClick={() => handleSelectService(service.id)}>
+                    {service.imageUrl && (
+                      <div className="h-32 w-full overflow-hidden">
+                        <img 
+                          src={service.imageUrl} 
+                          alt={service.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">{service.title}</CardTitle>
                       <CardDescription className="text-xs">{service.price}</CardDescription>
@@ -121,9 +130,10 @@ const ServiceEditor = () => {
             </>
           ) : (
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="details">Basic Details</TabsTrigger>
                 <TabsTrigger value="features">Features</TabsTrigger>
+                <TabsTrigger value="image">Image</TabsTrigger>
               </TabsList>
               
               <TabsContent value="details" className="space-y-4 pt-4">
@@ -200,6 +210,49 @@ const ServiceEditor = () => {
                     <Button type="button" onClick={handleAddFeature}>
                       <Plus className="h-4 w-4 mr-2" /> Add
                     </Button>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="image" className="space-y-6 pt-4">
+                <div className="space-y-4">
+                  <Label htmlFor="imageUrl">Service Image URL</Label>
+                  <Input 
+                    id="imageUrl" 
+                    name="imageUrl" 
+                    value={editingService.imageUrl || ''} 
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.jpg" 
+                  />
+                  
+                  {editingService.imageUrl ? (
+                    <div className="mt-4">
+                      <Label className="mb-2 block">Preview</Label>
+                      <div className="border rounded-lg overflow-hidden h-48">
+                        <img 
+                          src={editingService.imageUrl}
+                          alt="Service preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "https://via.placeholder.com/400x200?text=Image+Error";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-12 border rounded-lg bg-gray-50">
+                      <div className="text-center">
+                        <Image className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500">No image provided</p>
+                        <p className="text-gray-400 text-sm">Enter a URL above to add an image</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="text-sm text-gray-500 mt-2">
+                    <p>Recommended image dimensions: 800x400px</p>
+                    <p>For best results, use high-quality images with a 2:1 aspect ratio.</p>
                   </div>
                 </div>
               </TabsContent>

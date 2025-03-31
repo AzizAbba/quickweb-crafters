@@ -10,6 +10,7 @@ export interface ServiceType {
   price: string;
   deliveryTime: string;
   type: "basic" | "standard" | "advanced" | "ecommerce";
+  imageUrl?: string;
 }
 
 export interface TestimonialType {
@@ -43,6 +44,19 @@ export interface MessageType {
   isRead: boolean;
 }
 
+export interface TeamMemberType {
+  name: string;
+  role: string;
+  bio: string;
+  image: string;
+}
+
+interface AboutContent {
+  story: string;
+  mission: string;
+  team: TeamMemberType[];
+}
+
 interface SiteContent {
   heroTitle: string;
   heroSubtitle: string;
@@ -56,7 +70,9 @@ interface DataContextType {
   messages: MessageType[];
   users: UserWithPassword[];
   siteContent: SiteContent;
+  aboutContent: AboutContent;
   updateSiteContent: (newContent: Partial<SiteContent>) => void;
+  updateAboutContent: (newContent: Partial<AboutContent>) => void;
   addOrder: (order: Omit<OrderType, "id" | "createdAt">) => void;
   updateOrderStatus: (id: string, status: OrderType["status"]) => void;
   addMessage: (message: Omit<MessageType, "id" | "createdAt" | "isRead">) => void;
@@ -78,9 +94,10 @@ const defaultServices: ServiceType[] = [
       "Basic SEO",
       "Mobile Friendly",
     ],
-    price: "$10",
+    price: "Free",
     deliveryTime: "3 days",
     type: "basic",
+    imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "service-2",
@@ -93,9 +110,10 @@ const defaultServices: ServiceType[] = [
       "Advanced SEO",
       "Social Media Integration",
     ],
-    price: "$18",
+    price: "Free",
     deliveryTime: "4 days",
     type: "standard",
+    imageUrl: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "service-3",
@@ -109,9 +127,10 @@ const defaultServices: ServiceType[] = [
       "Google Analytics Integration",
       "Maintenance Support",
     ],
-    price: "$25",
+    price: "Free",
     deliveryTime: "5 days",
     type: "advanced",
+    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "service-4",
@@ -125,9 +144,10 @@ const defaultServices: ServiceType[] = [
       "Customer Accounts",
       "Inventory Management",
     ],
-    price: "$79",
-    deliveryTime: "7-10 days",
+    price: "Free",
+    deliveryTime: "7 days",
     type: "ecommerce",
+    imageUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
   },
 ];
 
@@ -218,15 +238,48 @@ const defaultSiteContent: SiteContent = {
   aboutContent: "QuickWeb Creations is a professional web development service that helps businesses, individuals, and entrepreneurs establish a strong online presence. We design modern, responsive, and SEO-optimized websites with clean, high-quality code."
 };
 
+const defaultAboutContent: AboutContent = {
+  story: "QuickWeb Creations was founded with a simple mission: to provide affordable, high-quality websites for businesses of all sizes. Our team of experienced developers and designers work together to create beautiful, functional websites that help our clients succeed online.",
+  mission: "Our mission is to empower businesses with beautiful, functional, and affordable websites. We believe that every business deserves a great online presence, regardless of size or budget.",
+  team: [
+    {
+      name: "Sarah Johnson",
+      role: "Founder & CEO",
+      bio: "With over 10 years of experience in web development and design, Sarah leads our team with passion and expertise.",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
+    },
+    {
+      name: "Michael Lee",
+      role: "Lead Developer",
+      bio: "Michael specializes in front-end development and has a keen eye for creating responsive, user-friendly websites.",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
+    },
+    {
+      name: "Emma Rodriguez",
+      role: "UX Designer",
+      bio: "Emma combines creative design with user experience expertise to create websites that are both beautiful and functional.",
+      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
+    },
+    {
+      name: "David Chen",
+      role: "Project Manager",
+      bio: "David ensures all projects are delivered on time and to the highest standard, with excellent communication throughout.",
+      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
+    }
+  ]
+};
+
 // Create the context with default values to avoid undefined issues
-const DataContext = createContext<DataContextType>({
+export const DataContext = createContext<DataContextType>({
   services: defaultServices,
   testimonials: defaultTestimonials,
   orders: defaultOrders,
   messages: defaultMessages,
   users: [],
   siteContent: defaultSiteContent,
+  aboutContent: defaultAboutContent,
   updateSiteContent: () => {},
+  updateAboutContent: () => {},
   addOrder: () => {},
   updateOrderStatus: () => {},
   addMessage: () => {},
@@ -241,6 +294,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [orders, setOrders] = useState<OrderType[]>(defaultOrders);
   const [messages, setMessages] = useState<MessageType[]>(defaultMessages);
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultSiteContent);
+  const [aboutContent, setAboutContent] = useState<AboutContent>(defaultAboutContent);
   const [users, setUsers] = useState<UserWithPassword[]>([]);
 
   // Load data from local storage on initial render
@@ -260,12 +314,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedOrders = localStorage.getItem("quickweb_orders");
     const storedMessages = localStorage.getItem("quickweb_messages");
     const storedSiteContent = localStorage.getItem("quickweb_site_content");
+    const storedAboutContent = localStorage.getItem("quickweb_about_content");
 
     if (storedServices) setServices(JSON.parse(storedServices));
     if (storedTestimonials) setTestimonials(JSON.parse(storedTestimonials));
     if (storedOrders) setOrders(JSON.parse(storedOrders));
     if (storedMessages) setMessages(JSON.parse(storedMessages));
     if (storedSiteContent) setSiteContent(JSON.parse(storedSiteContent));
+    if (storedAboutContent) setAboutContent(JSON.parse(storedAboutContent));
   }, []);
 
   // Load users from localStorage whenever it changes
@@ -294,10 +350,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("quickweb_orders", JSON.stringify(orders));
     localStorage.setItem("quickweb_messages", JSON.stringify(messages));
     localStorage.setItem("quickweb_site_content", JSON.stringify(siteContent));
-  }, [services, testimonials, orders, messages, siteContent]);
+    localStorage.setItem("quickweb_about_content", JSON.stringify(aboutContent));
+  }, [services, testimonials, orders, messages, siteContent, aboutContent]);
 
   const updateSiteContent = (newContent: Partial<SiteContent>) => {
     setSiteContent((prev) => ({ ...prev, ...newContent }));
+  };
+
+  const updateAboutContent = (newContent: Partial<AboutContent>) => {
+    setAboutContent((prev) => ({ ...prev, ...newContent }));
   };
 
   const addOrder = (order: Omit<OrderType, "id" | "createdAt">) => {
@@ -307,6 +368,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
     setOrders((prev) => [...prev, newOrder]);
+    return Promise.resolve(newOrder);
   };
 
   const updateOrderStatus = (id: string, status: OrderType["status"]) => {
@@ -373,7 +435,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     messages,
     users,
     siteContent,
+    aboutContent,
     updateSiteContent,
+    updateAboutContent,
     addOrder,
     updateOrderStatus,
     addMessage,
@@ -391,7 +455,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useData = () => {
   const context = useContext(DataContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useData must be used within a DataProvider");
   }
   return context;

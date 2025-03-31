@@ -16,13 +16,15 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import OrderPage from "./pages/OrderPage";
+import AboutUsPage from "./pages/AboutUsPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <TooltipProvider>
         <AuthProvider>
           <DataProvider>
             <Toaster />
@@ -35,12 +37,14 @@ const App = () => (
               <Route path="/signin" element={<SignInPage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/order/:serviceId?" element={<OrderPage />} />
+              <Route path="/about" element={<AboutUsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </DataProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

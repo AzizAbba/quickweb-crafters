@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Check } from "lucide-react";
 
 interface ServiceCardProps {
   title: string;
@@ -12,6 +13,7 @@ interface ServiceCardProps {
   ctaText?: string;
   ctaLink?: string;
   type?: "basic" | "standard" | "advanced" | "ecommerce";
+  imageUrl?: string;
 }
 
 const ServiceCard = ({
@@ -23,6 +25,7 @@ const ServiceCard = ({
   ctaText = "Learn More",
   ctaLink = "/contact",
   type = "basic",
+  imageUrl,
 }: ServiceCardProps) => {
   const getCardStyle = () => {
     switch (type) {
@@ -38,7 +41,16 @@ const ServiceCard = ({
   };
 
   return (
-    <Card className={`card-hover ${getCardStyle()}`}>
+    <Card className={`card-hover ${getCardStyle()} overflow-hidden transition-all duration-300 hover:shadow-lg`}>
+      {imageUrl && (
+        <div className="relative h-48 overflow-hidden">
+          <img 
+            src={imageUrl} 
+            alt={title} 
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
+        </div>
+      )}
       <CardHeader>
         <CardTitle className="text-xl font-bold">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -47,20 +59,7 @@ const ServiceCard = ({
         <ul className="space-y-2">
           {features.map((feature, index) => (
             <li key={index} className="flex items-start">
-              <svg
-                className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                ></path>
-              </svg>
+              <Check className="h-4 w-4 text-green-500 mr-2 mt-1 flex-shrink-0" />
               <span className="text-sm text-gray-600">{feature}</span>
             </li>
           ))}
@@ -79,7 +78,11 @@ const ServiceCard = ({
         )}
       </CardContent>
       <CardFooter>
-        <Link to={ctaLink} className="w-full">
+        <Link to={
+          ctaText === "Order Now" 
+            ? `/order/${title.toLowerCase().replace(/\s+/g, '-')}` 
+            : ctaLink
+        } className="w-full">
           <Button className="w-full">{ctaText}</Button>
         </Link>
       </CardFooter>

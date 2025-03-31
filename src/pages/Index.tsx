@@ -6,6 +6,7 @@ import TestimonialCard from "@/components/TestimonialCard";
 import { useData } from "@/context/DataContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { CheckCircle, ArrowRight } from "lucide-react";
 
 const Index = () => {
   const { services, testimonials, siteContent } = useData();
@@ -71,9 +72,10 @@ const Index = () => {
                   features={service.features.slice(0, 3)}
                   price={service.price}
                   deliveryTime={service.deliveryTime}
-                  ctaText="Learn More"
-                  ctaLink="/services"
+                  ctaText="Order Now"
+                  ctaLink={`/order/${service.id}`}
                   type={service.type}
+                  imageUrl={service.imageUrl}
                 />
               ))}
             </div>
@@ -85,8 +87,90 @@ const Index = () => {
           </div>
         </section>
 
-        {/* About Section */}
+        {/* Process Section */}
         <section className="py-16 md:py-24">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                We follow a simple process to create your website quickly and efficiently.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100">
+                <div className="bg-brand-blue/10 rounded-full w-14 h-14 flex items-center justify-center mb-4">
+                  <span className="text-brand-blue text-2xl font-bold">1</span>
+                </div>
+                <h3 className="text-xl font-bold mb-3">Order & Brief</h3>
+                <p className="text-gray-600 mb-4">
+                  Choose a package and provide details about your project. Tell us your requirements and expectations.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>No payment upfront</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>Consultation via email</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100">
+                <div className="bg-brand-blue/10 rounded-full w-14 h-14 flex items-center justify-center mb-4">
+                  <span className="text-brand-blue text-2xl font-bold">2</span>
+                </div>
+                <h3 className="text-xl font-bold mb-3">Design & Development</h3>
+                <p className="text-gray-600 mb-4">
+                  Our team designs and develops your website according to your specifications, with constant updates.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>Regular progress updates</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>Feedback incorporation</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100">
+                <div className="bg-brand-blue/10 rounded-full w-14 h-14 flex items-center justify-center mb-4">
+                  <span className="text-brand-blue text-2xl font-bold">3</span>
+                </div>
+                <h3 className="text-xl font-bold mb-3">Launch & Support</h3>
+                <p className="text-gray-600 mb-4">
+                  Once approved, we launch your website and provide support to ensure everything runs smoothly.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>Full source code access</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
+                    <span>Post-launch support</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="text-center mt-12">
+              <Button asChild variant="outline" size="lg" className="gap-2">
+                <Link to="/about">
+                  Learn More About Us <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* About Section */}
+        <section className="py-16 md:py-24 bg-gray-50">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-center gap-12">
               <div className="md:w-1/2 animate-fade-in">
@@ -105,7 +189,7 @@ const Index = () => {
                   </div>
                 </div>
                 <Button asChild>
-                  <Link to="/contact">Contact Us</Link>
+                  <Link to="/about">Learn More</Link>
                 </Button>
               </div>
               <div className="md:w-1/2">
@@ -124,7 +208,7 @@ const Index = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 md:py-24 bg-gray-50">
+        <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center mb-16 animate-slide-up">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Clients Say</h2>
