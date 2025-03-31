@@ -2,27 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useData } from "./DataContext";
-
-// Create a User interface that allows either role
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: "user" | "admin";
-  active?: boolean;
-}
-
-// Create a separate interface for users in the array that includes the password
-interface UserWithPassword {
-  id: string;
-  username: string;
-  email: string;
-  password: string;
-  role: "user" | "admin";
-  active?: boolean;
-}
-
-export type { UserWithPassword };
+import type { User, UserWithPassword } from "@/types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -52,9 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<UserWithPassword[]>(initialUsers);
   const [loading, setLoading] = useState(true);
   
-  // Enable access to DataContext
-  const dataContext = useContext(useData["_context"]);
-
   useEffect(() => {
     // Check local storage for authentication
     const storedUser = localStorage.getItem("quickweb_user");
@@ -86,13 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Save users to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("quickweb_users", JSON.stringify(users));
-    
-    // Update DataContext users if available
-    if (dataContext) {
-      // This is a workaround since we can't directly import and use setUsers from DataContext due to circular dependencies
-      localStorage.setItem("quickweb_users", JSON.stringify(users));
-    }
-  }, [users, dataContext]);
+  }, [users]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simulate API call delay
