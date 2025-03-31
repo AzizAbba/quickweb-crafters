@@ -35,13 +35,10 @@ const ContactForm = () => {
     // Submit the message to DataContext
     setTimeout(() => {
       addMessage({
-        id: `msg-${Date.now()}`, // Add unique ID for messages
         name: formData.name,
         email: formData.email,
         subject: formData.subject,
         message: formData.message,
-        createdAt: new Date().toISOString(),
-        read: false,
       });
       
       toast({

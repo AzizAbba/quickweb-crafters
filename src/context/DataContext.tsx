@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { UserWithPassword } from "@/types/auth";
 
@@ -32,6 +31,7 @@ export interface OrderType {
   details: string;
   businessType?: string;
   requirements?: string;
+  price?: string;
 }
 
 export interface MessageType {
@@ -55,12 +55,36 @@ interface AboutContent {
   story: string;
   mission: string;
   team: TeamMemberType[];
+  teamImage?: string;
 }
 
 interface SiteContent {
   heroTitle: string;
   heroSubtitle: string;
   aboutContent: string;
+  heroImage?: string;
+  pricingTitle?: string;
+  pricingSubtitle?: string;
+  pricingDescription?: string;
+  contactTitle?: string;
+  contactSubtitle?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactAddress?: string;
+}
+
+export interface FooterLinks {
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+  tiktok?: string;
+}
+
+export interface LegalContent {
+  privacyPolicy?: string;
+  termsOfService?: string;
 }
 
 interface DataContextType {
@@ -71,8 +95,12 @@ interface DataContextType {
   users: UserWithPassword[];
   siteContent: SiteContent;
   aboutContent: AboutContent;
+  footerLinks: FooterLinks;
+  legalContent: LegalContent;
   updateSiteContent: (newContent: Partial<SiteContent>) => void;
   updateAboutContent: (newContent: Partial<AboutContent>) => void;
+  updateFooterLinks: (links: FooterLinks) => void;
+  updateLegalContent: (content: LegalContent) => void;
   addOrder: (order: Omit<OrderType, "id" | "createdAt">) => void;
   updateOrderStatus: (id: string, status: OrderType["status"]) => void;
   addMessage: (message: Omit<MessageType, "id" | "createdAt" | "isRead">) => void;
@@ -81,7 +109,6 @@ interface DataContextType {
   updateUserStatus: (id: string, active: boolean) => void;
 }
 
-// Default values for the context
 const defaultServices: ServiceType[] = [
   {
     id: "service-1",
@@ -269,7 +296,18 @@ const defaultAboutContent: AboutContent = {
   ]
 };
 
-// Create the context with default values to avoid undefined issues
+const defaultFooterLinks: FooterLinks = {
+  facebook: "https://facebook.com",
+  instagram: "https://instagram.com",
+  twitter: "https://twitter.com",
+  linkedin: "https://linkedin.com"
+};
+
+const defaultLegalContent: LegalContent = {
+  privacyPolicy: "",
+  termsOfService: ""
+};
+
 export const DataContext = createContext<DataContextType>({
   services: defaultServices,
   testimonials: defaultTestimonials,
@@ -278,8 +316,12 @@ export const DataContext = createContext<DataContextType>({
   users: [],
   siteContent: defaultSiteContent,
   aboutContent: defaultAboutContent,
+  footerLinks: defaultFooterLinks,
+  legalContent: defaultLegalContent,
   updateSiteContent: () => {},
   updateAboutContent: () => {},
+  updateFooterLinks: () => {},
+  updateLegalContent: () => {},
   addOrder: () => {},
   updateOrderStatus: () => {},
   addMessage: () => {},
@@ -295,11 +337,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [messages, setMessages] = useState<MessageType[]>(defaultMessages);
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultSiteContent);
   const [aboutContent, setAboutContent] = useState<AboutContent>(defaultAboutContent);
+  const [footerLinks, setFooterLinks] = useState<FooterLinks>(defaultFooterLinks);
+  const [legalContent, setLegalContent] = useState<LegalContent>(defaultLegalContent);
   const [users, setUsers] = useState<UserWithPassword[]>([]);
 
-  // Load data from local storage on initial render
   useEffect(() => {
-    // Load users from localStorage (managed by AuthContext)
     const storedUsers = localStorage.getItem("quickweb_users");
     if (storedUsers) {
       try {
@@ -315,6 +357,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedMessages = localStorage.getItem("quickweb_messages");
     const storedSiteContent = localStorage.getItem("quickweb_site_content");
     const storedAboutContent = localStorage.getItem("quickweb_about_content");
+    const storedFooterLinks = localStorage.getItem("quickweb_footer_links");
+    const storedLegalContent = localStorage.getItem("quickweb_legal_content");
 
     if (storedServices) setServices(JSON.parse(storedServices));
     if (storedTestimonials) setTestimonials(JSON.parse(storedTestimonials));
@@ -322,9 +366,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedMessages) setMessages(JSON.parse(storedMessages));
     if (storedSiteContent) setSiteContent(JSON.parse(storedSiteContent));
     if (storedAboutContent) setAboutContent(JSON.parse(storedAboutContent));
+    if (storedFooterLinks) setFooterLinks(JSON.parse(storedFooterLinks));
+    if (storedLegalContent) setLegalContent(JSON.parse(storedLegalContent));
   }, []);
 
-  // Load users from localStorage whenever it changes
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "quickweb_users" && e.newValue) {
@@ -343,7 +388,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Save data to local storage when it changes
   useEffect(() => {
     localStorage.setItem("quickweb_services", JSON.stringify(services));
     localStorage.setItem("quickweb_testimonials", JSON.stringify(testimonials));
@@ -351,7 +395,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("quickweb_messages", JSON.stringify(messages));
     localStorage.setItem("quickweb_site_content", JSON.stringify(siteContent));
     localStorage.setItem("quickweb_about_content", JSON.stringify(aboutContent));
-  }, [services, testimonials, orders, messages, siteContent, aboutContent]);
+    localStorage.setItem("quickweb_footer_links", JSON.stringify(footerLinks));
+    localStorage.setItem("quickweb_legal_content", JSON.stringify(legalContent));
+  }, [services, testimonials, orders, messages, siteContent, aboutContent, footerLinks, legalContent]);
 
   const updateSiteContent = (newContent: Partial<SiteContent>) => {
     setSiteContent((prev) => ({ ...prev, ...newContent }));
@@ -359,6 +405,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateAboutContent = (newContent: Partial<AboutContent>) => {
     setAboutContent((prev) => ({ ...prev, ...newContent }));
+  };
+
+  const updateFooterLinks = (links: FooterLinks) => {
+    setFooterLinks(links);
+  };
+
+  const updateLegalContent = (content: LegalContent) => {
+    setLegalContent(content);
   };
 
   const addOrder = (order: Omit<OrderType, "id" | "createdAt">) => {
@@ -406,14 +460,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUserStatus = (id: string, active: boolean) => {
-    // Update users in DataContext
     setUsers((prev) =>
       prev.map((user) =>
         user.id === id ? { ...user, active } : user
       )
     );
     
-    // Also update the localStorage directly to keep AuthContext in sync
     const storedUsers = localStorage.getItem("quickweb_users");
     if (storedUsers) {
       try {
@@ -436,8 +488,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     users,
     siteContent,
     aboutContent,
+    footerLinks,
+    legalContent,
     updateSiteContent,
     updateAboutContent,
+    updateFooterLinks,
+    updateLegalContent,
     addOrder,
     updateOrderStatus,
     addMessage,

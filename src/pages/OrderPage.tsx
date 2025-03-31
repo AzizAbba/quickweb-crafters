@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -80,8 +79,6 @@ const OrderPage = () => {
         details: formData.details,
         businessType: formData.businessType,
         requirements: formData.requirements,
-        price: "Free", // Changed to free as requested
-        createdAt: new Date().toISOString(),
       });
       
       setStep(3);

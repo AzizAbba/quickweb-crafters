@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { Facebook, Instagram, Twitter, Youtube, Linkedin, TikTok } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Linkedin, BrandTiktok } from "lucide-react";
 
 interface SocialLink {
   name: string;
@@ -64,7 +64,7 @@ const FooterSocialEditor = ({ initialSocialLinks = {}, onSave }: FooterSocialEdi
       name: "tiktok", 
       url: initialSocialLinks.tiktok || "", 
       enabled: !!initialSocialLinks.tiktok,
-      icon: <TikTok className="h-5 w-5" />
+      icon: <BrandTiktok className="h-5 w-5" />
     }
   ]);
 
