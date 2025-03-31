@@ -193,7 +193,7 @@ const OrderPage = () => {
                     </ul>
                   </CardContent>
                   <CardFooter className="flex justify-between">
-                    <span className="text-lg font-bold text-brand-blue">Free</span>
+                    <span className="text-lg font-bold text-brand-blue"></span>
                     <Button size="sm">Select</Button>
                   </CardFooter>
                 </Card>
