@@ -28,6 +28,27 @@ export interface OrderType {
   status: "pending" | "in-progress" | "completed" | "cancelled";
   createdAt: string;
   details: string;
+  businessType?: string;
+  requirements?: string;
+}
+
+export interface MessageType {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface UserWithPassword {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  active?: boolean;
 }
 
 interface SiteContent {
@@ -40,10 +61,16 @@ interface DataContextType {
   services: ServiceType[];
   testimonials: TestimonialType[];
   orders: OrderType[];
+  messages: MessageType[];
+  users: UserWithPassword[];
   siteContent: SiteContent;
   updateSiteContent: (newContent: Partial<SiteContent>) => void;
   addOrder: (order: Omit<OrderType, "id" | "createdAt">) => void;
   updateOrderStatus: (id: string, status: OrderType["status"]) => void;
+  addMessage: (message: Omit<MessageType, "id" | "createdAt" | "isRead">) => void;
+  markMessageAsRead: (id: string) => void;
+  updateService: (service: ServiceType) => void;
+  updateUserStatus: (id: string, active: boolean) => void;
 }
 
 const defaultServices: ServiceType[] = [
@@ -142,6 +169,8 @@ const defaultOrders: OrderType[] = [
     status: "completed",
     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     details: "Business website for a local plumber",
+    businessType: "Small Business",
+    requirements: "Need to showcase services, pricing, and contact information",
   },
   {
     id: "order-2",
@@ -152,6 +181,8 @@ const defaultOrders: OrderType[] = [
     status: "in-progress",
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     details: "Portfolio website with gallery integration",
+    businessType: "Personal Portfolio",
+    requirements: "Need to showcase my photography work with a modern design",
   },
   {
     id: "order-3",
@@ -162,7 +193,30 @@ const defaultOrders: OrderType[] = [
     status: "pending",
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     details: "Online store for handmade crafts with 50+ products",
+    businessType: "Small Business",
+    requirements: "Need product categories, shopping cart, and payment integration",
   },
+];
+
+const defaultMessages: MessageType[] = [
+  {
+    id: "message-1",
+    name: "Sarah Johnson",
+    email: "sarah@example.com",
+    subject: "Question about pricing",
+    message: "Hi, I'm interested in your services but have some questions about pricing for my specific needs. Could you provide some more details? Thanks!",
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    isRead: true,
+  },
+  {
+    id: "message-2",
+    name: "Michael Brown",
+    email: "michael@example.com",
+    subject: "Website maintenance inquiry",
+    message: "Hello, I have an existing website that needs some updates and maintenance. Do you offer this kind of service? If yes, what are your rates?\n\nBest regards,\nMichael",
+    createdAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+    isRead: false,
+  }
 ];
 
 const defaultSiteContent: SiteContent = {
@@ -177,18 +231,30 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [services, setServices] = useState<ServiceType[]>(defaultServices);
   const [testimonials, setTestimonials] = useState<TestimonialType[]>(defaultTestimonials);
   const [orders, setOrders] = useState<OrderType[]>(defaultOrders);
+  const [messages, setMessages] = useState<MessageType[]>(defaultMessages);
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultSiteContent);
+  const [users, setUsers] = useState<UserWithPassword[]>([]);
+
+  // Load user data from AuthContext initial state
+  useEffect(() => {
+    const storedUsers = localStorage.getItem("quickweb_users");
+    if (storedUsers) {
+      setUsers(JSON.parse(storedUsers));
+    }
+  }, []);
 
   // Load data from local storage on initial render
   useEffect(() => {
     const storedServices = localStorage.getItem("quickweb_services");
     const storedTestimonials = localStorage.getItem("quickweb_testimonials");
     const storedOrders = localStorage.getItem("quickweb_orders");
+    const storedMessages = localStorage.getItem("quickweb_messages");
     const storedSiteContent = localStorage.getItem("quickweb_site_content");
 
     if (storedServices) setServices(JSON.parse(storedServices));
     if (storedTestimonials) setTestimonials(JSON.parse(storedTestimonials));
     if (storedOrders) setOrders(JSON.parse(storedOrders));
+    if (storedMessages) setMessages(JSON.parse(storedMessages));
     if (storedSiteContent) setSiteContent(JSON.parse(storedSiteContent));
   }, []);
 
@@ -197,8 +263,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("quickweb_services", JSON.stringify(services));
     localStorage.setItem("quickweb_testimonials", JSON.stringify(testimonials));
     localStorage.setItem("quickweb_orders", JSON.stringify(orders));
+    localStorage.setItem("quickweb_messages", JSON.stringify(messages));
     localStorage.setItem("quickweb_site_content", JSON.stringify(siteContent));
-  }, [services, testimonials, orders, siteContent]);
+    localStorage.setItem("quickweb_users", JSON.stringify(users));
+  }, [services, testimonials, orders, messages, siteContent, users]);
 
   const updateSiteContent = (newContent: Partial<SiteContent>) => {
     setSiteContent((prev) => ({ ...prev, ...newContent }));
@@ -221,16 +289,56 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const addMessage = (message: Omit<MessageType, "id" | "createdAt" | "isRead">) => {
+    const newMessage: MessageType = {
+      ...message,
+      id: `message-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+    };
+    setMessages((prev) => [...prev, newMessage]);
+  };
+
+  const markMessageAsRead = (id: string) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message.id === id ? { ...message, isRead: true } : message
+      )
+    );
+  };
+
+  const updateService = (updatedService: ServiceType) => {
+    setServices((prev) =>
+      prev.map((service) =>
+        service.id === updatedService.id ? updatedService : service
+      )
+    );
+  };
+
+  const updateUserStatus = (id: string, active: boolean) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === id ? { ...user, active } : user
+      )
+    );
+  };
+
   return (
     <DataContext.Provider
       value={{
         services,
         testimonials,
         orders,
+        messages,
+        users,
         siteContent,
         updateSiteContent,
         addOrder,
         updateOrderStatus,
+        addMessage,
+        markMessageAsRead,
+        updateService,
+        updateUserStatus,
       }}
     >
       {children}

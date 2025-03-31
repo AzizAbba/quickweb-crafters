@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useData } from "./DataContext";
 
 // Create a User interface that allows either role
 interface User {
@@ -8,6 +9,7 @@ interface User {
   username: string;
   email: string;
   role: "user" | "admin";
+  active?: boolean;
 }
 
 // Create a separate interface for users in the array that includes the password
@@ -17,7 +19,10 @@ interface UserWithPassword {
   email: string;
   password: string;
   role: "user" | "admin";
+  active?: boolean;
 }
+
+export type { UserWithPassword };
 
 interface AuthContextType {
   user: User | null;
@@ -36,6 +41,7 @@ const adminUser: UserWithPassword = {
   password: "admin123",
   email: "admin@quickweb.com",
   role: "admin",
+  active: true,
 };
 
 // Sample users array to simulate a database - now properly typed to accept both user roles
@@ -45,6 +51,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [users, setUsers] = useState<UserWithPassword[]>(initialUsers);
   const [loading, setLoading] = useState(true);
+  
+  // Enable access to DataContext
+  const dataContext = useContext(useData["_context"]);
 
   useEffect(() => {
     // Check local storage for authentication
@@ -58,8 +67,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("quickweb_user");
       }
     }
+    
+    // Load saved users
+    const storedUsers = localStorage.getItem("quickweb_users");
+    if (storedUsers) {
+      try {
+        setUsers(JSON.parse(storedUsers));
+      } catch (error) {
+        console.error("Failed to parse stored users", error);
+      }
+    } else {
+      localStorage.setItem("quickweb_users", JSON.stringify(initialUsers));
+    }
+    
     setLoading(false);
   }, []);
+
+  // Save users to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("quickweb_users", JSON.stringify(users));
+    
+    // Update DataContext users if available
+    if (dataContext) {
+      // This is a workaround since we can't directly import and use setUsers from DataContext due to circular dependencies
+      localStorage.setItem("quickweb_users", JSON.stringify(users));
+    }
+  }, [users, dataContext]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simulate API call delay
@@ -70,12 +103,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     if (foundUser) {
+      // Check if user is active
+      if (foundUser.active === false) {
+        toast.error("Account has been deactivated. Please contact support.");
+        return false;
+      }
+      
       const { password: _, ...userWithoutPassword } = foundUser;
       setUser(userWithoutPassword);
       localStorage.setItem("quickweb_user", JSON.stringify(userWithoutPassword));
+      
+      toast.success(`Welcome back, ${foundUser.username}!`);
       return true;
     }
 
+    toast.error("Invalid email or password");
     return false;
   };
 
@@ -85,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check if user already exists
     if (users.some((u) => u.email === email)) {
+      toast.error("An account with this email already exists");
       return false;
     }
 
@@ -94,6 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       password,
       role: "user",
+      active: true,
     };
 
     // Add user to "database"
@@ -104,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userWithoutPassword);
     localStorage.setItem("quickweb_user", JSON.stringify(userWithoutPassword));
     
+    toast.success("Account created successfully!");
     return true;
   };
 

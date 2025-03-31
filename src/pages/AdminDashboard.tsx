@@ -9,9 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { useData, OrderType } from "@/context/DataContext";
+import { useData } from "@/context/DataContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import UsersTable from "@/components/admin/UsersTable";
+import ServiceEditor from "@/components/admin/ServiceEditor";
+import MessagesList from "@/components/admin/MessagesList";
 import {
   Select,
   SelectContent,
@@ -24,10 +27,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { orders, siteContent, updateSiteContent, updateOrderStatus } = useData();
+  const { orders, siteContent, updateSiteContent, updateOrderStatus, services, messages } = useData();
   
   const [content, setContent] = useState(siteContent);
-  const [filteredOrders, setFilteredOrders] = useState<OrderType[]>(orders);
+  const [filteredOrders, setFilteredOrders] = useState(orders);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
@@ -66,7 +69,7 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleStatusChange = (orderId: string, newStatus: OrderType["status"]) => {
+  const handleStatusChange = (orderId: string, newStatus: any) => {
     updateOrderStatus(orderId, newStatus);
     toast({
       title: "Status Updated",
@@ -85,13 +88,16 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-gray-600">Manage website content and orders</p>
+            <p className="text-gray-600">Manage website content, orders, users and messages</p>
           </div>
 
           <Tabs defaultValue="orders" className="space-y-8">
-            <TabsList className="grid w-full md:w-auto grid-cols-2 md:inline-flex">
+            <TabsList className="grid w-full md:w-auto grid-cols-4 md:inline-flex">
               <TabsTrigger value="orders">Orders</TabsTrigger>
               <TabsTrigger value="content">Website Content</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="messages">Messages</TabsTrigger>
             </TabsList>
 
             {/* Orders Tab */}
@@ -144,19 +150,31 @@ const AdminDashboard = () => {
                                   <p>{order.userName}</p>
                                   <p className="text-gray-500 text-sm">{order.userEmail}</p>
                                 </div>
+                                {order.businessType && (
+                                  <div className="mt-2">
+                                    <h4 className="font-medium text-sm mb-1">Project Type</h4>
+                                    <p>{order.businessType}</p>
+                                  </div>
+                                )}
                               </div>
                               <div>
                                 <div className="mb-4">
                                   <h4 className="font-medium text-sm mb-1">Details</h4>
                                   <p className="text-gray-600">{order.details}</p>
                                 </div>
+                                {order.requirements && (
+                                  <div className="mb-4">
+                                    <h4 className="font-medium text-sm mb-1">Requirements</h4>
+                                    <p className="text-gray-600">{order.requirements}</p>
+                                  </div>
+                                )}
                                 <div>
                                   <h4 className="font-medium text-sm mb-1">Status</h4>
                                   <Select 
                                     defaultValue={order.status}
                                     onValueChange={(value) => handleStatusChange(
                                       order.id, 
-                                      value as OrderType["status"]
+                                      value
                                     )}
                                   >
                                     <SelectTrigger>
@@ -239,6 +257,21 @@ const AdminDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            {/* Services Tab */}
+            <TabsContent value="services">
+              <ServiceEditor />
+            </TabsContent>
+            
+            {/* Users Tab */}
+            <TabsContent value="users">
+              <UsersTable />
+            </TabsContent>
+            
+            {/* Messages Tab */}
+            <TabsContent value="messages">
+              <MessagesList />
             </TabsContent>
           </Tabs>
         </div>

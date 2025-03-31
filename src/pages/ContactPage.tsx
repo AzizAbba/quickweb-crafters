@@ -1,21 +1,51 @@
 
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactForm from "@/components/ContactForm";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const ContactPage = () => {
   const { user } = useAuth();
   const { services, addOrder } = useData();
   const { toast } = useToast();
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [details, setDetails] = useState("");
+  const [orderData, setOrderData] = useState({
+    details: "",
+    businessType: "Small Business",
+    requirements: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleOrderDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setOrderData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  
+  const handleBusinessTypeChange = (value: string) => {
+    setOrderData((prev) => ({
+      ...prev,
+      businessType: value,
+    }));
+  };
   
   const handleOrderSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +69,7 @@ const ContactPage = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
+    // Submit order with enhanced details
     setTimeout(() => {
       addOrder({
         userId: user.id,
@@ -47,7 +77,9 @@ const ContactPage = () => {
         userEmail: user.email,
         serviceType: selectedService,
         status: "pending",
-        details: details,
+        details: orderData.details,
+        businessType: orderData.businessType,
+        requirements: orderData.requirements,
       });
       
       toast({
@@ -56,7 +88,11 @@ const ContactPage = () => {
       });
       
       setSelectedService(null);
-      setDetails("");
+      setOrderData({
+        details: "",
+        businessType: "Small Business",
+        requirements: "",
+      });
       setIsSubmitting(false);
     }, 1000);
   };
@@ -112,48 +148,151 @@ const ContactPage = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-6">Place an Order</h3>
+                <h3 className="text-2xl font-bold mb-6">Send Us a Message</h3>
+                <ContactForm />
+              </div>
+              
+              <div>
+                <h2 className="text-3xl font-bold mb-6">Place an Order</h2>
+                
                 {user ? (
                   <Card className="p-6">
-                    <form onSubmit={handleOrderSubmit} className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Select Service</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {services.map((service) => (
-                            <div
-                              key={service.id}
-                              className={`border rounded-md p-3 cursor-pointer ${
-                                selectedService === service.title
-                                  ? "border-brand-blue bg-brand-blue/5"
-                                  : "border-gray-200 hover:border-brand-blue/50"
-                              }`}
-                              onClick={() => setSelectedService(service.title)}
-                            >
-                              <div className="font-medium">{service.title}</div>
-                              <div className="text-sm text-gray-500">{service.price}</div>
+                    <Tabs defaultValue="service" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="service">Select Service</TabsTrigger>
+                        <TabsTrigger value="details" disabled={!selectedService}>Project Details</TabsTrigger>
+                        <TabsTrigger value="review" disabled={!selectedService || !orderData.details}>Review</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="service">
+                        <div className="py-4">
+                          <p className="text-gray-600 mb-4">Select the service that best fits your needs:</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {services.map((service) => (
+                              <div
+                                key={service.id}
+                                className={`border rounded-md p-4 cursor-pointer ${
+                                  selectedService === service.title
+                                    ? "border-brand-blue bg-brand-blue/5"
+                                    : "border-gray-200 hover:border-brand-blue/50"
+                                }`}
+                                onClick={() => setSelectedService(service.title)}
+                              >
+                                <div className="font-medium mb-1">{service.title}</div>
+                                <div className="text-sm text-gray-500 mb-2">{service.price}</div>
+                                <div className="text-xs text-gray-500">Delivery: {service.deliveryTime}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {selectedService && (
+                            <div className="mt-6 flex justify-end">
+                              <TabsTrigger asChild value="details">
+                                <Button>Continue to Project Details</Button>
+                              </TabsTrigger>
                             </div>
-                          ))}
+                          )}
                         </div>
-                      </div>
+                      </TabsContent>
                       
-                      <div>
-                        <label className="block text-sm font-medium mb-2" htmlFor="details">
-                          Project Details
-                        </label>
-                        <textarea
-                          id="details"
-                          className="w-full rounded-md border-gray-300 shadow-sm p-3 border"
-                          rows={4}
-                          placeholder="Describe your project requirements..."
-                          value={details}
-                          onChange={(e) => setDetails(e.target.value)}
-                        ></textarea>
-                      </div>
+                      <TabsContent value="details">
+                        <form className="py-4 space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="businessType">Project Type</Label>
+                            <Select value={orderData.businessType} onValueChange={handleBusinessTypeChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select project type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Small Business">Small Business</SelectItem>
+                                <SelectItem value="Corporate">Corporate</SelectItem>
+                                <SelectItem value="Personal Portfolio">Personal Portfolio</SelectItem>
+                                <SelectItem value="Blog">Blog</SelectItem>
+                                <SelectItem value="E-commerce">E-commerce</SelectItem>
+                                <SelectItem value="Non-profit">Non-profit</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="details">Project Overview</Label>
+                            <Textarea
+                              id="details"
+                              name="details"
+                              rows={3}
+                              placeholder="Describe your project in general terms..."
+                              value={orderData.details}
+                              onChange={handleOrderDataChange}
+                              required
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="requirements">Specific Requirements</Label>
+                            <Textarea
+                              id="requirements"
+                              name="requirements"
+                              rows={4}
+                              placeholder="List any specific features, design preferences, or technical requirements..."
+                              value={orderData.requirements}
+                              onChange={handleOrderDataChange}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between mt-6">
+                            <TabsTrigger asChild value="service">
+                              <Button variant="outline">Back to Services</Button>
+                            </TabsTrigger>
+                            
+                            <TabsTrigger asChild value="review" disabled={!orderData.details}>
+                              <Button>Review Order</Button>
+                            </TabsTrigger>
+                          </div>
+                        </form>
+                      </TabsContent>
                       
-                      <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting ? "Submitting..." : "Place Order"}
-                      </Button>
-                    </form>
+                      <TabsContent value="review">
+                        <div className="py-4 space-y-6">
+                          <div>
+                            <h3 className="text-lg font-bold mb-4">Order Summary</h3>
+                            
+                            <div className="space-y-4 mb-6">
+                              <div className="bg-gray-50 p-4 rounded-md">
+                                <div className="text-sm text-gray-500 mb-1">Service</div>
+                                <div className="font-medium">{selectedService}</div>
+                              </div>
+                              
+                              <div className="bg-gray-50 p-4 rounded-md">
+                                <div className="text-sm text-gray-500 mb-1">Project Type</div>
+                                <div>{orderData.businessType}</div>
+                              </div>
+                              
+                              <div className="bg-gray-50 p-4 rounded-md">
+                                <div className="text-sm text-gray-500 mb-1">Project Overview</div>
+                                <p className="text-gray-800">{orderData.details}</p>
+                              </div>
+                              
+                              {orderData.requirements && (
+                                <div className="bg-gray-50 p-4 rounded-md">
+                                  <div className="text-sm text-gray-500 mb-1">Specific Requirements</div>
+                                  <p className="text-gray-800">{orderData.requirements}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-between">
+                            <TabsTrigger asChild value="details">
+                              <Button variant="outline">Edit Details</Button>
+                            </TabsTrigger>
+                            
+                            <Button onClick={handleOrderSubmit} disabled={isSubmitting}>
+                              {isSubmitting ? "Processing..." : "Submit Order"}
+                            </Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
                   </Card>
                 ) : (
                   <Card className="p-6 text-center">
@@ -163,11 +302,6 @@ const ContactPage = () => {
                     </Button>
                   </Card>
                 )}
-              </div>
-              
-              <div>
-                <h2 className="text-3xl font-bold mb-6">Send Us a Message</h2>
-                <ContactForm />
               </div>
             </div>
           </div>

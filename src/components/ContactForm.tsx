@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { useData } from "@/context/DataContext";
 
 const ContactForm = () => {
   const { toast } = useToast();
+  const { addMessage } = useData();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,10 +32,14 @@ const ContactForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Submit the message to DataContext
     setTimeout(() => {
-      // Here you would normally send the data to a server
-      console.log("Form submitted:", formData);
+      addMessage({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+      });
       
       toast({
         title: "Message Sent",
@@ -97,7 +103,7 @@ const ContactForm = () => {
           name="message"
           value={formData.message}
           onChange={handleChange}
-          placeholder="Tell us more about your project..."
+          placeholder="Tell us more about your inquiry..."
           rows={5}
           required
         />
