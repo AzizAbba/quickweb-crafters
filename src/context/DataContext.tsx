@@ -1,5 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
+import type { UserWithPassword } from "@/types/auth";
 
 export interface ServiceType {
   id: string;
@@ -40,15 +40,6 @@ export interface MessageType {
   message: string;
   createdAt: string;
   isRead: boolean;
-}
-
-export interface UserWithPassword {
-  id: string;
-  username: string;
-  email: string;
-  password: string;
-  role: "user" | "admin";
-  active?: boolean;
 }
 
 interface SiteContent {
@@ -235,16 +226,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultSiteContent);
   const [users, setUsers] = useState<UserWithPassword[]>([]);
 
-  // Load user data from AuthContext initial state
-  useEffect(() => {
-    const storedUsers = localStorage.getItem("quickweb_users");
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    }
-  }, []);
-
   // Load data from local storage on initial render
   useEffect(() => {
+    // Load users from localStorage (managed by AuthContext)
+    const storedUsers = localStorage.getItem("quickweb_users");
+    if (storedUsers) {
+      try {
+        setUsers(JSON.parse(storedUsers));
+      } catch (error) {
+        console.error("Failed to parse stored users", error);
+      }
+    }
+    
     const storedServices = localStorage.getItem("quickweb_services");
     const storedTestimonials = localStorage.getItem("quickweb_testimonials");
     const storedOrders = localStorage.getItem("quickweb_orders");
@@ -258,6 +251,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedSiteContent) setSiteContent(JSON.parse(storedSiteContent));
   }, []);
 
+  // Load users from localStorage whenever it changes
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "quickweb_users" && e.newValue) {
+        try {
+          setUsers(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error("Failed to parse updated users", error);
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   // Save data to local storage when it changes
   useEffect(() => {
     localStorage.setItem("quickweb_services", JSON.stringify(services));
@@ -265,8 +277,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("quickweb_orders", JSON.stringify(orders));
     localStorage.setItem("quickweb_messages", JSON.stringify(messages));
     localStorage.setItem("quickweb_site_content", JSON.stringify(siteContent));
-    localStorage.setItem("quickweb_users", JSON.stringify(users));
-  }, [services, testimonials, orders, messages, siteContent, users]);
+  }, [services, testimonials, orders, messages, siteContent]);
 
   const updateSiteContent = (newContent: Partial<SiteContent>) => {
     setSiteContent((prev) => ({ ...prev, ...newContent }));
@@ -316,11 +327,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUserStatus = (id: string, active: boolean) => {
+    // Update users in DataContext
     setUsers((prev) =>
       prev.map((user) =>
         user.id === id ? { ...user, active } : user
       )
     );
+    
+    // Also update the localStorage directly to keep AuthContext in sync
+    const storedUsers = localStorage.getItem("quickweb_users");
+    if (storedUsers) {
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        const updatedUsers = parsedUsers.map((user: UserWithPassword) => 
+          user.id === id ? { ...user, active } : user
+        );
+        localStorage.setItem("quickweb_users", JSON.stringify(updatedUsers));
+      } catch (error) {
+        console.error("Failed to update user status in localStorage", error);
+      }
+    }
   };
 
   return (

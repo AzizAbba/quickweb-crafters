@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useData } from "./DataContext";
 import type { User, UserWithPassword } from "@/types/auth";
 
 interface AuthContextType {
