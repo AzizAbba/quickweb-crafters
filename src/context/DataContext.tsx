@@ -232,6 +232,7 @@ const defaultOrders: OrderType[] = [
     details: "Business website for a local plumber",
     businessType: "Small Business",
     requirements: "Need to showcase services, pricing, and contact information",
+    price: "$499"
   },
   {
     id: "order-2",
@@ -244,6 +245,7 @@ const defaultOrders: OrderType[] = [
     details: "Portfolio website with gallery integration",
     businessType: "Personal Portfolio",
     requirements: "Need to showcase my photography work with a modern design",
+    price: "$899"
   },
   {
     id: "order-3",
@@ -256,6 +258,7 @@ const defaultOrders: OrderType[] = [
     details: "Online store for handmade crafts with 50+ products",
     businessType: "Small Business",
     requirements: "Need product categories, shopping cart, and payment integration",
+    price: "$2,499"
   },
 ];
 

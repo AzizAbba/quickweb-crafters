@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PricingPage = () => {
-  const { services } = useData();
+  const { services, siteContent } = useData();
 
   return (
     <>
@@ -17,10 +17,9 @@ const PricingPage = () => {
         {/* Hero Section */}
         <section className="bg-brand-blue text-white py-16 md:py-24">
           <div className="container mx-auto px-4 max-w-7xl text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Transparent Pricing</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{siteContent.pricingTitle || "Transparent Pricing"}</h1>
             <p className="text-xl max-w-3xl mx-auto">
-              Choose from our affordable packages designed to meet your needs.
-              No hidden fees, just straightforward pricing.
+              {siteContent.pricingSubtitle || "Choose from our affordable packages designed to meet your needs. No hidden fees, just straightforward pricing."}
             </p>
           </div>
         </section>
@@ -31,8 +30,7 @@ const PricingPage = () => {
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Select Your Package</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                We offer a variety of packages to suit your needs and budget.
-                Not sure which to choose? Contact us for a custom quote.
+                {siteContent.pricingDescription || "We offer a variety of packages to suit your needs and budget. Not sure which to choose? Contact us for a custom quote."}
               </p>
             </div>
             
@@ -56,6 +54,7 @@ const PricingPage = () => {
                       ctaText="Order Now"
                       ctaLink="/contact"
                       type={service.type}
+                      imageUrl={service.imageUrl}
                     />
                   ))}
                 </div>
@@ -76,6 +75,7 @@ const PricingPage = () => {
                         ctaText="Order Now"
                         ctaLink="/contact"
                         type={service.type}
+                        imageUrl={service.imageUrl}
                       />
                     ))}
                 </div>
@@ -96,6 +96,7 @@ const PricingPage = () => {
                         ctaText="Order Now"
                         ctaLink="/contact"
                         type={service.type}
+                        imageUrl={service.imageUrl}
                       />
                     ))}
                 </div>
@@ -142,8 +143,7 @@ const PricingPage = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-xl font-semibold mb-2">Can I upgrade my package later?</h3>
                 <p className="text-gray-600">
-                  Yes, you can upgrade from a basic package to a more advanced one. You'll only need to pay the difference
-                  between the packages plus a small upgrade fee.
+                  {siteContent.pricingFaq || "Yes, you can upgrade from a basic package to a more advanced one. You'll only need to pay the difference between the packages plus a small upgrade fee."}
                 </p>
               </div>
             </div>

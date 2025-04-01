@@ -1,95 +1,145 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Check, ArrowRight, Clock, Calendar } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { CheckCircle } from "lucide-react";
 
 const OrderPage = () => {
-  const { serviceId } = useParams();
   const navigate = useNavigate();
+  const { type } = useParams();
   const { services, addOrder } = useData();
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const [selectedService, setSelectedService] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    businessType: "Small Business",
-    details: "",
-    requirements: "",
-  });
-  const [step, setStep] = useState(1);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [businessType, setBusinessType] = useState("");
+  const [details, setDetails] = useState("");
+  const [requirements, setRequirements] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [selectedServiceData, setSelectedServiceData] = useState(services[0] || null);
 
   useEffect(() => {
-    if (serviceId) {
-      const service = services.find((s) => s.id === serviceId);
-      if (service) {
-        setSelectedService(service);
-        setStep(2);
+    // If there's a type parameter, find the matching service
+    if (type) {
+      const serviceByType = services.find(service => 
+        service.type.toLowerCase() === type.toLowerCase()
+      );
+      
+      if (serviceByType) {
+        setSelectedService(serviceByType.id);
+        setSelectedServiceData(serviceByType);
       }
     }
-  }, [serviceId, services]);
+    
+    // Scroll to top on component mount
+    window.scrollTo(0, 0);
+  }, [type, services]);
 
+  // Update selected service data when selection changes
   useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        name: user.name || prev.name,
-        email: user.email || prev.email
-      }));
+    if (selectedService) {
+      const service = services.find(s => s.id === selectedService);
+      if (service) {
+        setSelectedServiceData(service);
+      }
     }
-  }, [user]);
+  }, [selectedService, services]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleServiceChange = (value: string) => {
+    setSelectedService(value);
+    const service = services.find(s => s.id === value);
+    if (service) {
+      setSelectedServiceData(service);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedService) {
+    if (!user) {
       toast({
-        title: "Error",
-        description: "Please select a service",
+        title: "Authentication Required",
+        description: "Please sign in to place an order.",
+        variant: "destructive",
+      });
+      navigate("/signin");
+      return;
+    }
+    
+    if (!selectedService || !businessType || !details) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
         variant: "destructive",
       });
       return;
     }
     
-    setIsSubmitting(true);
-    
     try {
-      await addOrder({
-        userId: user?.id || "guest",
-        userName: formData.name,
-        userEmail: formData.email,
-        serviceType: selectedService.title,
-        status: "pending",
-        details: formData.details,
-        businessType: formData.businessType,
-        requirements: formData.requirements,
-      });
+      setIsSubmitting(true);
       
-      setStep(3);
+      // Get selected service data
+      const service = services.find(s => s.id === selectedService);
+      if (!service) {
+        throw new Error("Invalid service selected");
+      }
       
-      toast({
-        title: "Order Submitted",
-        description: "Our team will contact you shortly via email to discuss your project and payment options.",
-      });
+      // Prepare order object
+      const newOrder = {
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        serviceType: service.title,
+        status: "pending" as const,
+        details,
+        businessType,
+        requirements,
+        price: service.price
+      };
+      
+      // Add the order
+      await addOrder(newOrder);
+      
+      // Show success message
+      setSuccessMessage("Order submitted successfully!");
+      
+      // Reset form
+      setBusinessType("");
+      setDetails("");
+      setRequirements("");
+      
+      // Redirect after delay
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+      
     } catch (error) {
       toast({
-        title: "Error",
+        title: "Error Submitting Order",
         description: "There was a problem submitting your order. Please try again.",
         variant: "destructive",
       });
@@ -98,251 +148,151 @@ const OrderPage = () => {
     }
   };
 
-  const handleServiceSelect = (service: any) => {
-    setSelectedService(service);
-    setStep(2);
-  };
-
-  const businessTypes = [
-    "Small Business",
-    "Standard Website", // Added standard website as requested
-    "Corporate",
-    "E-commerce",
-    "Portfolio",
-    "Blog",
-    "Non-profit",
-    "Educational"
-  ];
-
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="container mx-auto max-w-5xl">
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="relative">
-              <div className="flex justify-between items-center mb-6">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 1 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
-                  {step > 1 ? <Check className="h-5 w-5" /> : "1"}
-                </div>
-                <div className={`h-1 absolute top-5 left-10 right-1/2 -translate-x-5 ${step >= 2 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
-                <div className={`h-1 absolute top-5 left-1/2 right-10 translate-x-5 ${step >= 3 ? "bg-brand-blue" : "bg-gray-200"}`}></div>
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 2 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
-                  {step > 2 ? <Check className="h-5 w-5" /> : "2"}
-                </div>
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${step >= 3 ? "bg-brand-blue text-white" : "bg-gray-200"} z-10`}>
-                  {step > 3 ? <Check className="h-5 w-5" /> : "3"}
-                </div>
+      <main>
+        {successMessage ? (
+          <section className="py-24 flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-green-100 text-green-600 mb-6">
+                <CheckCircle className="h-12 w-12" />
               </div>
-              <div className="flex justify-between text-sm">
-                <div className={`w-20 text-center ${step >= 1 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Select Service</div>
-                <div className={`w-20 text-center ${step >= 2 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Project Details</div>
-                <div className={`w-20 text-center ${step >= 3 ? "text-brand-blue font-medium" : "text-gray-500"}`}>Confirmation</div>
-              </div>
+              <h1 className="text-3xl font-bold mb-4">{successMessage}</h1>
+              <p className="text-xl text-gray-600 mb-8">Thank you for your order! We'll be in touch soon.</p>
+              <Button onClick={() => navigate("/")} size="lg">Return to Homepage</Button>
             </div>
-            
-            <h2 className="text-2xl lg:text-3xl font-bold text-center mt-8">
-              {step === 1 && "Select Your Service"}
-              {step === 2 && "Project Details"}
-              {step === 3 && "Order Confirmation"}
-            </h2>
-            {step === 1 && (
-              <p className="text-center text-gray-600 mt-2">Choose the service that best fits your needs</p>
-            )}
-          </div>
-
-          {step === 1 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {services.map((service) => (
-                <Card 
-                  key={service.id} 
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedService?.id === service.id ? "ring-2 ring-brand-blue" : ""
-                  }`}
-                  onClick={() => handleServiceSelect(service)}
-                >
-                  {service.imageUrl && (
-                    <div className="h-40 w-full overflow-hidden">
-                      <img 
-                        src={service.imageUrl} 
-                        alt={service.title}
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                  )}
-                  <CardHeader className="pb-2">
-                    <CardTitle>{service.title}</CardTitle>
-                    <CardDescription>{service.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-sm text-gray-500 mb-4">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>Delivery: {service.deliveryTime}</span>
-                    </div>
-                    <ul className="space-y-1">
-                      {service.features.slice(0, 3).map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <Check className="h-4 w-4 text-green-500 mr-2 mt-1 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                      {service.features.length > 3 && (
-                        <li className="text-sm text-brand-blue">+ {service.features.length - 3} more features</li>
-                      )}
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <span className="text-lg font-bold text-brand-blue"></span>
-                    <Button size="sm">Select</Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {step === 2 && (
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle>Order Details for {selectedService?.title}</CardTitle>
-                <CardDescription>Please provide the details for your project</CardDescription>
-              </CardHeader>
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Your Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="businessType">Business/Project Type</Label>
-                    <select
-                      id="businessType"
-                      name="businessType"
-                      value={formData.businessType}
-                      onChange={handleChange as any}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {businessTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="details">Project Details</Label>
-                    <Textarea
-                      id="details"
-                      name="details"
-                      placeholder="Describe your project needs and expectations in detail"
-                      rows={4}
-                      value={formData.details}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="requirements">Specific Requirements</Label>
-                    <Textarea
-                      id="requirements"
-                      name="requirements"
-                      placeholder="Any specific features, design requirements, technology preferences, etc."
-                      rows={3}
-                      value={formData.requirements}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="bg-gray-50 p-4 rounded-lg border">
-                    <div className="flex justify-between mb-2">
-                      <span>Service:</span>
-                      <span className="font-medium">{selectedService?.title}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span>Price:</span>
-                      <span className="font-medium text-green-600">Free</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Estimated Delivery:</span>
-                      <span className="font-medium">{selectedService?.deliveryTime}</span>
-                    </div>
-                    <p className="mt-3 text-sm text-gray-500">
-                      Our team will contact you to discuss payment options after reviewing your project requirements.
-                    </p>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button type="button" variant="outline" onClick={() => setStep(1)}>
-                    Back
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : "Complete Order"} <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-          )}
-
-          {step === 3 && (
-            <Card className="shadow-lg">
-              <CardHeader className="text-center">
-                <div className="mx-auto bg-green-100 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                  <Check className="h-8 w-8 text-green-600" />
-                </div>
-                <CardTitle className="text-2xl">Order Submitted Successfully!</CardTitle>
-                <CardDescription className="text-lg">Thank you for your order</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="mb-6 text-lg">
-                  Our team will contact you shortly via email to discuss your project requirements and payment options.
+          </section>
+        ) : (
+          <>
+            <section className="bg-brand-blue text-white py-16 md:py-24">
+              <div className="container mx-auto px-4 max-w-7xl text-center">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">Order a Website</h1>
+                <p className="text-xl max-w-3xl mx-auto">
+                  Tell us about your project, and we'll create the perfect website for you.
                 </p>
-                <div className="bg-gray-50 p-6 rounded-lg max-w-md mx-auto border">
-                  <div className="flex justify-between mb-4">
-                    <span className="font-medium">Order Reference:</span>
-                    <span className="font-medium">{`ORD-${Date.now().toString().slice(-6)}`}</span>
+              </div>
+            </section>
+            
+            <section className="py-16 md:py-24">
+              <div className="container mx-auto px-4 max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div>
+                    <h2 className="text-3xl font-bold mb-6">Order Form</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="service">Service Type</Label>
+                        <Select value={selectedService || ""} onValueChange={handleServiceChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a service type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {services.map((service) => (
+                              <SelectItem key={service.id} value={service.id}>
+                                {service.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="businessType">Business/Project Type</Label>
+                        <Select value={businessType} onValueChange={setBusinessType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your business type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Small Business">Small Business</SelectItem>
+                            <SelectItem value="E-Commerce">E-Commerce</SelectItem>
+                            <SelectItem value="Personal Website">Personal Website</SelectItem>
+                            <SelectItem value="Portfolio">Portfolio</SelectItem>
+                            <SelectItem value="Blog">Blog</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="details">Project Details</Label>
+                        <Textarea 
+                          id="details"
+                          value={details}
+                          onChange={(e) => setDetails(e.target.value)}
+                          placeholder="Describe your project and what you need"
+                          rows={5}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="requirements">Specific Requirements (Optional)</Label>
+                        <Textarea 
+                          id="requirements"
+                          value={requirements}
+                          onChange={(e) => setRequirements(e.target.value)}
+                          placeholder="Any specific features or requirements you need"
+                          rows={3}
+                        />
+                      </div>
+                      
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Submitting..." : "Place Order"}
+                      </Button>
+                    </form>
                   </div>
-                  <div className="flex justify-between mb-4">
-                    <span className="font-medium">Service:</span>
-                    <span>{selectedService?.title}</span>
-                  </div>
-                  <div className="flex justify-between mb-4">
-                    <span className="font-medium">Business Type:</span>
-                    <span>{formData.businessType}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Expected Contact:</span>
-                    <span className="flex items-center text-brand-blue">
-                      <Calendar className="h-4 w-4 mr-1" /> Within 24 hours
-                    </span>
+                  
+                  <div>
+                    {selectedServiceData ? (
+                      <Card className="border-2 border-brand-blue/20">
+                        <CardHeader>
+                          <CardTitle className="text-2xl">{selectedServiceData.title}</CardTitle>
+                          <CardDescription className="text-base">{selectedServiceData.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="mb-4">
+                            <h3 className="font-semibold text-lg mb-2">Includes:</h3>
+                            <ul className="space-y-2">
+                              {selectedServiceData.features.map((feature, index) => (
+                                <li key={index} className="flex items-start">
+                                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          <div className="flex justify-between items-center border-t border-gray-200 pt-4 mt-4">
+                            <div>
+                              <h3 className="font-semibold text-lg">Price</h3>
+                              <p className="text-2xl font-bold text-brand-blue">{selectedServiceData.price}</p>
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-lg">Delivery Time</h3>
+                              <p className="text-lg">{selectedServiceData.deliveryTime}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="bg-gray-50 border-t">
+                          <div className="w-full">
+                            <p className="text-sm text-gray-500 mb-1">
+                              After ordering, our team will contact you to discuss your project in detail.
+                            </p>
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    ) : (
+                      <div className="flex items-center justify-center h-full bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12">
+                        <p className="text-gray-500 text-center">
+                          Select a service to see details
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button onClick={() => navigate("/")}>Return to Home</Button>
-              </CardFooter>
-            </Card>
-          )}
-        </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
       <Footer />
     </>
