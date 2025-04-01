@@ -65,22 +65,14 @@ const ContactPage = () => {
           </div>
         </section>
 
-        {/* We Work Globally Section */}
+        {/* We Work Globally Section - Removed image as requested */}
         <section className="py-16 md:py-24 bg-gray-50">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="text-center mb-12">
+            <div className="text-center">
               <h2 className="text-3xl font-bold mb-4">We Work Globally</h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 Our team provides web development services worldwide. No matter where you are, we can help you create a stunning online presence.
               </p>
-            </div>
-            
-            <div className="flex justify-center">
-              <img 
-                src={siteContent.globalTeamImage || "/lovable-uploads/18d521e2-4263-49c2-b198-619c922b08c4.png"} 
-                alt="Global Team" 
-                className="rounded-lg shadow-lg max-w-full md:max-w-3xl"
-              />
             </div>
           </div>
         </section>

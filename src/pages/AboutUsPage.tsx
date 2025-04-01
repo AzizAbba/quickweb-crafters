@@ -24,40 +24,44 @@ const AboutUsPage = () => {
         </section>
 
         {/* Story Section */}
-        <section className="py-16 md:py-24">
-          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl font-bold mb-6">Our Story</h2>
-                <div className="prose prose-lg max-w-none">
-                  {aboutContent.story.split('\n').map((paragraph, index) => (
-                    <p key={index} className="mb-4">{paragraph}</p>
-                  ))}
+        {aboutContent.story && (
+          <section className="py-16 md:py-24">
+            <div className="container mx-auto px-4 max-w-7xl">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h2 className="text-3xl font-bold mb-6">Our Story</h2>
+                  <div className="prose prose-lg max-w-none">
+                    {aboutContent.story.split('\n').map((paragraph, index) => (
+                      <p key={index} className="mb-4">{paragraph}</p>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex justify-center">
+                  <img 
+                    src={siteContent.teamImage || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
+                    alt="Our Team" 
+                    className="rounded-lg shadow-lg max-w-full h-auto"
+                  />
                 </div>
               </div>
-              
-              <div className="flex justify-center">
-                <img 
-                  src={siteContent.teamImage || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
-                  alt="Our Team" 
-                  className="rounded-lg shadow-lg max-w-full h-auto"
-                />
-              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Mission Section */}
-        <section className="py-16 md:py-24 bg-gray-50">
-          <div className="container mx-auto px-4 max-w-7xl text-center">
-            <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
-            <div className="prose prose-lg mx-auto">
-              {aboutContent.mission.split('\n').map((paragraph, index) => (
-                <p key={index} className="mb-4">{paragraph}</p>
-              ))}
+        {aboutContent.mission && (
+          <section className="py-16 md:py-24 bg-gray-50">
+            <div className="container mx-auto px-4 max-w-7xl text-center">
+              <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+              <div className="prose prose-lg mx-auto">
+                {aboutContent.mission.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Custom Sections */}
         {siteContent.aboutSections && siteContent.aboutSections.length > 0 && (
