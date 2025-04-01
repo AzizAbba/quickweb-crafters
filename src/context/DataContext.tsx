@@ -283,7 +283,10 @@ const defaultMessages: MessageType[] = [
 const defaultSiteContent: SiteContent = {
   heroTitle: "Professional Websites, Delivered Fast",
   heroSubtitle: "We design modern, responsive, and SEO-optimized websites for businesses, individuals, and entrepreneurs.",
-  aboutContent: "QuickWeb Creations is a professional web development service that helps businesses, individuals, and entrepreneurs establish a strong online presence. We design modern, responsive, and SEO-optimized websites with clean, high-quality code."
+  aboutContent: "QuickWeb Creations is a professional web development service that helps businesses, individuals, and entrepreneurs establish a strong online presence. We design modern, responsive, and SEO-optimized websites with clean, high-quality code.",
+  homeSections: [],
+  aboutSections: [],
+  contactSections: []
 };
 
 const defaultAboutContent: AboutContent = {
