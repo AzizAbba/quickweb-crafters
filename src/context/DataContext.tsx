@@ -331,7 +331,70 @@ export const DataContext = createContext<DataContextType>({
 });
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [services, setServices] = useState<ServiceType[]>(defaultServices);
+  const [services, setServices] = useState<ServiceType[]>([
+    {
+      id: "1",
+      title: "Basic Website",
+      description: "Simple static website for small businesses and individuals",
+      features: [
+        "Responsive Design",
+        "Up to 5 Pages",
+        "Contact Form",
+        "SEO Optimization",
+        "Mobile Friendly",
+      ],
+      price: "$499",
+      deliveryTime: "3 days",
+      type: "basic"
+    },
+    {
+      id: "2",
+      title: "Standard Website",
+      description: "Interactive design with advanced UI elements",
+      features: [
+        "Everything in Basic",
+        "Up to 10 Pages",
+        "Custom Animations",
+        "Blog Integration",
+        "Social Media Integration",
+      ],
+      price: "$999",
+      deliveryTime: "4 days",
+      type: "standard"
+    },
+    {
+      id: "3",
+      title: "Advanced Website",
+      description: "Fully customized website with premium features",
+      features: [
+        "Everything in Standard",
+        "Unlimited Pages",
+        "Advanced Animations",
+        "Custom Admin Dashboard",
+        "Performance Optimization",
+      ],
+      price: "$1,999",
+      deliveryTime: "5 days",
+      type: "advanced"
+    },
+    {
+      id: "4",
+      title: "E-Commerce Package",
+      description: "Complete online store with product management and payment integration",
+      features: [
+        "Everything in Advanced",
+        "Product Catalog",
+        "Shopping Cart",
+        "Payment Gateway Integration",
+        "Order Management System",
+        "Customer Accounts",
+      ],
+      price: "$2,999",
+      deliveryTime: "7 days",
+      type: "ecommerce"
+    }
+  ]);
+
   const [testimonials, setTestimonials] = useState<TestimonialType[]>(defaultTestimonials);
   const [orders, setOrders] = useState<OrderType[]>(defaultOrders);
   const [messages, setMessages] = useState<MessageType[]>(defaultMessages);

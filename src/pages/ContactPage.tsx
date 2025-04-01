@@ -4,9 +4,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactForm from "@/components/ContactForm";
 import { useAuth } from "@/context/AuthContext";
+import { useData } from "@/context/DataContext";
 
 const ContactPage = () => {
   const { user } = useAuth();
+  const { siteContent } = useData();
 
   return (
     <>
@@ -135,7 +137,12 @@ const ContactPage = () => {
             </p>
             
             <div className="aspect-w-16 aspect-h-9 max-w-5xl mx-auto">
-              <div className="rounded-lg overflow-hidden shadow-lg bg-gray-200 h-[400px] flex items-center justify-center">
+              <div className="rounded-lg overflow-hidden shadow-lg h-[400px]">
+                <img 
+                  src="/lovable-uploads/311de303-225c-477a-8fc9-d42f4a91a1f1.png" 
+                  alt="Global team collaboration" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
