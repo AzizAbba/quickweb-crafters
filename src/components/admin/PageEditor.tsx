@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/context/DataContext";
@@ -27,18 +26,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PageSection } from "@/context/DataContext";
 
 interface PageData {
   [key: string]: any;
-}
-
-interface PageSection {
-  id: string;
-  title: string;
-  content: string;
-  type: 'hero' | 'content' | 'cta' | 'features' | 'testimonials' | 'image' | 'contact';
-  image?: string;
-  order: number;
 }
 
 const PageEditor = () => {
@@ -62,7 +53,6 @@ const PageEditor = () => {
   const [isDeletingSectionDialogOpen, setIsDeletingSectionDialogOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState<string | null>(null);
 
-  // Update local state when context changes
   useEffect(() => {
     setContent(siteContent);
     setEditingSections({
@@ -675,7 +665,6 @@ const PageEditor = () => {
         </CardContent>
       </Card>
 
-      {/* Add Section Dialog */}
       <AlertDialog open={isAddingSectionDialogOpen} onOpenChange={setIsAddingSectionDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -741,7 +730,6 @@ const PageEditor = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Section Confirmation Dialog */}
       <AlertDialog open={isDeletingSectionDialogOpen} onOpenChange={setIsDeletingSectionDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -58,6 +58,15 @@ interface AboutContent {
   teamImage?: string;
 }
 
+export interface PageSection {
+  id: string;
+  title: string;
+  content: string;
+  type: 'hero' | 'content' | 'cta' | 'features' | 'testimonials' | 'image' | 'contact';
+  image?: string;
+  order: number;
+}
+
 interface SiteContent {
   heroTitle: string;
   heroSubtitle: string;
@@ -71,6 +80,18 @@ interface SiteContent {
   contactEmail?: string;
   contactPhone?: string;
   contactAddress?: string;
+  homeSections?: PageSection[];
+  aboutSections?: PageSection[];
+  contactSections?: PageSection[];
+  teamImage?: string;
+  globalTeamImage?: string;
+  homeCtaText?: string;
+  servicesTitle?: string;
+  servicesSubtitle?: string;
+  servicesDescription?: string;
+  aboutTitle?: string;
+  aboutSubtitle?: string;
+  pricingFaq?: string;
 }
 
 export interface FooterLinks {
