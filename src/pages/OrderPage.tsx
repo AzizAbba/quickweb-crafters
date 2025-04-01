@@ -43,8 +43,8 @@ const OrderPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedServiceData, setSelectedServiceData] = useState(services[0] || null);
 
-  // Set default service based on URL parameter
   useEffect(() => {
+    // If there's a type parameter, find the matching service
     if (type) {
       const serviceByType = services.find(service => 
         service.type.toLowerCase() === type.toLowerCase()
@@ -150,13 +150,13 @@ const OrderPage = () => {
       <Navbar />
       <main>
         {successMessage ? (
-          <section className="py-12 md:py-24 flex items-center justify-center min-h-[60vh]">
+          <section className="py-24 flex items-center justify-center min-h-[60vh]">
             <div className="text-center max-w-2xl mx-auto px-4">
               <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-green-100 text-green-600 mb-6">
                 <CheckCircle className="h-12 w-12" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-4">{successMessage}</h1>
-              <p className="text-lg md:text-xl text-gray-600 mb-8">Thank you for your order! We'll contact you at <span className="font-semibold">{user?.email}</span> soon to discuss payment methods and project details.</p>
+              <h1 className="text-3xl font-bold mb-4">{successMessage}</h1>
+              <p className="text-xl text-gray-600 mb-8">Thank you for your order! We'll contact you at <span className="font-semibold">{user?.email}</span> soon to discuss payment methods and project details.</p>
               
               <Alert className="mb-8 bg-blue-50 border-blue-200">
                 <Info className="h-5 w-5" />
@@ -171,18 +171,18 @@ const OrderPage = () => {
           </section>
         ) : (
           <>
-            <section className="bg-brand-blue text-white py-12 md:py-20">
+            <section className="bg-brand-blue text-white py-16 md:py-24">
               <div className="container mx-auto px-4 max-w-7xl text-center">
-                <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Order a Website</h1>
-                <p className="text-lg md:text-xl max-w-3xl mx-auto">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">Order a Website</h1>
+                <p className="text-xl max-w-3xl mx-auto">
                   Tell us about your project, and we'll create the perfect website for you.
                 </p>
               </div>
             </section>
             
-            <section className="py-10 md:py-16">
+            <section className="py-16 md:py-24">
               <div className="container mx-auto px-4 max-w-7xl">
-                <Alert className="mb-6 md:mb-8 bg-blue-50 border-blue-200">
+                <Alert className="mb-8 bg-blue-50 border-blue-200">
                   <Info className="h-5 w-5" />
                   <AlertTitle>Information</AlertTitle>
                   <AlertDescription>
@@ -190,14 +190,14 @@ const OrderPage = () => {
                   </AlertDescription>
                 </Alert>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-6">Order Form</h2>
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <h2 className="text-3xl font-bold mb-6">Order Form</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="service">Service Type</Label>
                         <Select value={selectedService || ""} onValueChange={handleServiceChange}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select a service type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -213,7 +213,7 @@ const OrderPage = () => {
                       <div className="space-y-2">
                         <Label htmlFor="businessType">Business/Project Type</Label>
                         <Select value={businessType} onValueChange={setBusinessType}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select your business type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -235,7 +235,6 @@ const OrderPage = () => {
                           onChange={(e) => setDetails(e.target.value)}
                           placeholder="Describe your project and what you need"
                           rows={5}
-                          className="resize-none"
                         />
                       </div>
                       
@@ -247,25 +246,20 @@ const OrderPage = () => {
                           onChange={(e) => setRequirements(e.target.value)}
                           placeholder="Any specific features or requirements you need"
                           rows={3}
-                          className="resize-none"
                         />
                       </div>
                       
-                      <Button 
-                        type="submit" 
-                        className="w-full mt-4"
-                        disabled={isSubmitting}
-                      >
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
                         {isSubmitting ? "Submitting..." : "Place Order"}
                       </Button>
                     </form>
                   </div>
                   
-                  <div className="mt-8 lg:mt-0">
+                  <div>
                     {selectedServiceData ? (
-                      <Card className="border-2 border-brand-blue/20 lg:sticky lg:top-8">
+                      <Card className="border-2 border-brand-blue/20 sticky top-8">
                         <CardHeader>
-                          <CardTitle className="text-xl md:text-2xl">{selectedServiceData.title}</CardTitle>
+                          <CardTitle className="text-2xl">{selectedServiceData.title}</CardTitle>
                           <CardDescription className="text-base">{selectedServiceData.description}</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -274,14 +268,14 @@ const OrderPage = () => {
                             <ul className="space-y-2">
                               {selectedServiceData.features.map((feature, index) => (
                                 <li key={index} className="flex items-start">
-                                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
                                   <span>{feature}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-t border-gray-200 pt-4 mt-4 gap-4">
+                          <div className="flex justify-between items-center border-t border-gray-200 pt-4 mt-4">
                             <div>
                               <h3 className="font-semibold text-lg">Price</h3>
                               <p className="text-2xl font-bold text-brand-blue">{selectedServiceData.price}</p>
@@ -293,11 +287,11 @@ const OrderPage = () => {
                           </div>
                         </CardContent>
                         <CardFooter className="bg-gray-50 border-t">
-                          <Alert className="p-3 w-full bg-blue-50/50 border-blue-100">
-                            <AlertDescription className="text-sm text-gray-600">
+                          <div className="w-full">
+                            <p className="text-sm text-gray-600">
                               After ordering, our team will contact you to discuss your project in detail and payment methods.
-                            </AlertDescription>
-                          </Alert>
+                            </p>
+                          </div>
                         </CardFooter>
                       </Card>
                     ) : (
