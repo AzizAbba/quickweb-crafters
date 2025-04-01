@@ -25,7 +25,8 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, AlertCircle, Info } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -132,11 +133,7 @@ const OrderPage = () => {
       setDetails("");
       setRequirements("");
       
-      // Redirect after delay
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-      
+      // No redirect, let user see the success message
     } catch (error) {
       toast({
         title: "Error Submitting Order",
@@ -154,12 +151,21 @@ const OrderPage = () => {
       <main>
         {successMessage ? (
           <section className="py-24 flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
+            <div className="text-center max-w-2xl mx-auto px-4">
               <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-green-100 text-green-600 mb-6">
                 <CheckCircle className="h-12 w-12" />
               </div>
               <h1 className="text-3xl font-bold mb-4">{successMessage}</h1>
-              <p className="text-xl text-gray-600 mb-8">Thank you for your order! We'll be in touch soon.</p>
+              <p className="text-xl text-gray-600 mb-8">Thank you for your order! We'll contact you at <span className="font-semibold">{user?.email}</span> soon to discuss payment methods and project details.</p>
+              
+              <Alert className="mb-8 bg-blue-50 border-blue-200">
+                <Info className="h-5 w-5" />
+                <AlertTitle>Important Information</AlertTitle>
+                <AlertDescription>
+                  This is just an order request. No payment is required at this time. We'll contact you to discuss details and payment options.
+                </AlertDescription>
+              </Alert>
+              
               <Button onClick={() => navigate("/")} size="lg">Return to Homepage</Button>
             </div>
           </section>
@@ -176,6 +182,14 @@ const OrderPage = () => {
             
             <section className="py-16 md:py-24">
               <div className="container mx-auto px-4 max-w-7xl">
+                <Alert className="mb-8 bg-blue-50 border-blue-200">
+                  <Info className="h-5 w-5" />
+                  <AlertTitle>Information</AlertTitle>
+                  <AlertDescription>
+                    This form is for ordering only. No payment is required at this time. We'll contact you to discuss details and payment options.
+                  </AlertDescription>
+                </Alert>
+                
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <div>
                     <h2 className="text-3xl font-bold mb-6">Order Form</h2>
@@ -243,7 +257,7 @@ const OrderPage = () => {
                   
                   <div>
                     {selectedServiceData ? (
-                      <Card className="border-2 border-brand-blue/20">
+                      <Card className="border-2 border-brand-blue/20 sticky top-8">
                         <CardHeader>
                           <CardTitle className="text-2xl">{selectedServiceData.title}</CardTitle>
                           <CardDescription className="text-base">{selectedServiceData.description}</CardDescription>
@@ -274,8 +288,8 @@ const OrderPage = () => {
                         </CardContent>
                         <CardFooter className="bg-gray-50 border-t">
                           <div className="w-full">
-                            <p className="text-sm text-gray-500 mb-1">
-                              After ordering, our team will contact you to discuss your project in detail.
+                            <p className="text-sm text-gray-600">
+                              After ordering, our team will contact you to discuss your project in detail and payment methods.
                             </p>
                           </div>
                         </CardFooter>
