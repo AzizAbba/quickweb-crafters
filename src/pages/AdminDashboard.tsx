@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,7 @@ import { motion } from "framer-motion";
 import { 
   X, Plus, Calendar, Mail, Phone, Info, User, 
   Settings, Layout, Database, FileText, Menu,
-  MessageSquare, Users, Link as LinkIcon, FileText2
+  MessageSquare, Users, Link as LinkIcon, FileText2, FileTextIcon
 } from "lucide-react";
 import { TeamMemberType } from "@/context/DataContext";
 
@@ -72,7 +71,6 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    // Redirect if not logged in or not admin
     if (!user || user.role !== "admin") {
       toast({
         title: "Access Denied",
@@ -91,7 +89,6 @@ const AdminDashboard = () => {
     }
   }, [orders, statusFilter]);
 
-  // Update local state when context changes
   useEffect(() => {
     setContent(siteContent);
   }, [siteContent]);
@@ -230,13 +227,13 @@ const AdminDashboard = () => {
       case 'users': return <Users className="h-4 w-4" />;
       case 'messages': return <MessageSquare className="h-4 w-4" />;
       case 'social': return <LinkIcon className="h-4 w-4" />;
-      case 'legal': return <FileText2 className="h-4 w-4" />;
+      case 'legal': return <FileTextIcon className="h-4 w-4" />;
       default: return <Layout className="h-4 w-4" />;
     }
   };
 
   if (!user || user.role !== "admin") {
-    return null; // Don't render anything if not admin
+    return null;
   }
 
   const tabAnimation = {
@@ -352,7 +349,7 @@ const AdminDashboard = () => {
                 <span className="hidden md:inline">Social</span>
               </TabsTrigger>
               <TabsTrigger value="legal">
-                <FileText2 className="h-4 w-4 md:mr-1" />
+                <FileTextIcon className="h-4 w-4 md:mr-1" />
                 <span className="hidden md:inline">Legal</span>
               </TabsTrigger>
             </TabsList>
@@ -738,7 +735,6 @@ const AdminDashboard = () => {
                                           size="sm"
                                           className="absolute bottom-0 -right-2"
                                           onClick={() => {
-                                            // Trigger hidden file input
                                             const input = document.createElement('input');
                                             input.type = 'file';
                                             input.accept = 'image/*';
