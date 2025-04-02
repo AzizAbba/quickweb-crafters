@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ import { motion } from "framer-motion";
 import { 
   X, Plus, Calendar, Mail, Phone, Info, User, 
   Settings, Layout, Database, FileText, Menu,
-  MessageSquare, Users, Link as LinkIcon, FileText2, FileTextIcon
+  MessageSquare, Users, Link as LinkIcon, FileText as FileTextIcon
 } from "lucide-react";
 import { TeamMemberType } from "@/context/DataContext";
 
