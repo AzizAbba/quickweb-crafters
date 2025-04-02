@@ -21,4 +21,10 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    // Ensure proper MIME types for JavaScript modules
+    assetsDir: 'assets'
+  },
 }));

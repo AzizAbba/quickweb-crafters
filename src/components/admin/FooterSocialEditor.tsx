@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { Facebook, Instagram, Twitter, Youtube, Linkedin, ExternalLink, Copy, Check } from "lucide-react";
-import TikTok from "@/components/admin/TikTok"; // Import custom TikTok component
+import TikTok from "@/components/admin/TikTok"; // Custom TikTok component
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
