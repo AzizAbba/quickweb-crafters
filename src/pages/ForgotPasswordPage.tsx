@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { InfoCircle } from "lucide-react";
 
 const ForgotPasswordPage = () => {
   const { toast } = useToast();
@@ -26,7 +27,7 @@ const ForgotPasswordPage = () => {
       setSubmitted(true);
       toast({
         title: "Request submitted",
-        description: "If your email is in our system, you'll receive instructions shortly.",
+        description: "We've received your request. Our team will contact you shortly.",
       });
     } catch (error) {
       console.error("Error:", error);
@@ -55,12 +56,12 @@ const ForgotPasswordPage = () => {
             </p>
           </div>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg transform transition-all hover:shadow-xl">
             <CardHeader className="bg-brand-blue/5 pb-6">
               <CardTitle>Password Recovery</CardTitle>
               <CardDescription>
                 {submitted 
-                  ? "We've sent you an email with recovery instructions" 
+                  ? "We've received your request" 
                   : "Enter your email address below"
                 }
               </CardDescription>
@@ -82,31 +83,34 @@ const ForgotPasswordPage = () => {
                     />
                   </div>
 
+                  <div className="bg-blue-50 p-3 rounded-md flex items-start gap-2">
+                    <InfoCircle className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-gray-700">
+                      If you're having trouble recovering your password, please contact our support team directly at support@quickweb.com
+                    </p>
+                  </div>
+
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Processing..." : "Reset Password"}
                   </Button>
                 </form>
               ) : (
-                <div className="text-center py-4">
+                <div className="text-center py-4 space-y-4">
                   <p className="mb-4">
-                    If your email address is associated with an account, you will receive an email with password reset instructions.
+                    Our team will review your request and get back to you shortly with password recovery instructions.
                   </p>
-                  <p className="text-sm text-gray-500">
-                    Please check your inbox and spam folder.
-                  </p>
+                  <div className="bg-green-50 p-3 rounded-md">
+                    <p className="text-sm text-gray-700">
+                      For security reasons, password resets are manually processed by our team. Please check your inbox in the next 24 hours.
+                    </p>
+                  </div>
                 </div>
               )}
-              
-              <div className="mt-6 text-center text-sm">
-                <p className="text-gray-600">
-                  If you don't receive an email or need immediate assistance, please contact our support team directly.
-                </p>
-              </div>
             </CardContent>
             <CardFooter className="flex justify-center bg-gray-50 border-t">
               <p className="text-sm text-gray-600">
                 Remember your password?{" "}
-                <Link to="/signin" className="font-medium text-brand-blue hover:underline">
+                <Link to="/signin" className="font-medium text-brand-blue hover:underline transition-colors">
                   Sign in
                 </Link>
               </p>

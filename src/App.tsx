@@ -20,6 +20,7 @@ import OrderPage from "./pages/OrderPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/signin" element={<SignInPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/order" element={<OrderPage />} />
                 <Route path="/order/:type" element={<OrderPage />} />

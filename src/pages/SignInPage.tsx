@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { InfoCircle } from "lucide-react";
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const SignInPage = () => {
             <p className="mt-2 text-gray-600">Sign in to your account</p>
           </div>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg transform transition-all hover:shadow-xl">
             <CardHeader className="bg-brand-blue/5 pb-6">
               <CardTitle>Sign In</CardTitle>
               <CardDescription>
@@ -98,7 +99,7 @@ const SignInPage = () => {
                     <Label htmlFor="password">Password</Label>
                     <Link
                       to="/forgot-password"
-                      className="text-sm font-medium text-brand-blue hover:underline"
+                      className="text-sm font-medium text-brand-blue hover:underline transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -115,8 +116,15 @@ const SignInPage = () => {
                   />
                 </div>
 
+                <div className="bg-blue-50 p-3 rounded-md flex items-start gap-2">
+                  <InfoCircle className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    If you forgot your password, please <Link to="/forgot-password" className="font-medium text-brand-blue hover:underline">request assistance</Link> or contact our support team directly at support@quickweb.com
+                  </p>
+                </div>
+
                 {error && (
-                  <div className="text-sm font-medium text-red-600">{error}</div>
+                  <div className="text-sm font-medium text-red-600 bg-red-50 p-3 rounded-md">{error}</div>
                 )}
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -127,7 +135,7 @@ const SignInPage = () => {
             <CardFooter className="flex justify-center bg-gray-50 border-t">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link to="/signup" className="font-medium text-brand-blue hover:underline">
+                <Link to="/signup" className="font-medium text-brand-blue hover:underline transition-colors">
                   Sign up
                 </Link>
               </p>
