@@ -22,7 +22,14 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => {
   // Get the base URL from the data attribute set in main.tsx
@@ -44,7 +51,7 @@ const App = () => {
                 <Route path="/signin" element={<SignInPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/*" element={<AdminDashboard />} />
                 <Route path="/order" element={<OrderPage />} />
                 <Route path="/order/:type" element={<OrderPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
