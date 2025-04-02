@@ -13,10 +13,16 @@ document.documentElement.setAttribute('data-deployment', isProd ? 'prod' : 'dev'
 
 // For GitHub Pages, we need to ensure paths are properly resolved
 if (isProd) {
-  // Update base href for all resources
+  // Remove any existing base element to avoid duplicates
+  const existingBase = document.querySelector('base');
+  if (existingBase) {
+    existingBase.remove();
+  }
+  
+  // Add a new base element with the correct href
   const baseElement = document.createElement('base');
   baseElement.setAttribute('href', baseUrl);
-  document.head.appendChild(baseElement);
+  document.head.insertBefore(baseElement, document.head.firstChild);
   
   // Log deployment information
   console.log(`Running in production mode with base URL: ${baseUrl}`);
