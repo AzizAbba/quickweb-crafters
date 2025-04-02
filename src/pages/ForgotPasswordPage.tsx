@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 const ForgotPasswordPage = () => {
   const { toast } = useToast();
@@ -84,7 +84,7 @@ const ForgotPasswordPage = () => {
                   </div>
 
                   <div className="bg-blue-50 p-3 rounded-md flex items-start gap-2">
-                    <InfoCircle className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
+                    <Info className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-gray-700">
                       If you're having trouble recovering your password, please contact our support team directly at support@quickweb.com
                     </p>

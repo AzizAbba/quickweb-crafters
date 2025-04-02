@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ const SignInPage = () => {
                 </div>
 
                 <div className="bg-blue-50 p-3 rounded-md flex items-start gap-2">
-                  <InfoCircle className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
+                  <Info className="h-5 w-5 text-brand-blue mt-0.5 flex-shrink-0" />
                   <p className="text-sm text-gray-700">
                     If you forgot your password, please <Link to="/forgot-password" className="font-medium text-brand-blue hover:underline">request assistance</Link> or contact our support team directly at support@quickweb.com
                   </p>
