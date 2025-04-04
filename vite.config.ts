@@ -25,7 +25,6 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     sourcemap: true,
     assetsDir: 'assets',
-    // Simplified build options without problematic manual configurations
-    emptyOutDir: true,
+    emptyOutDir: true
   },
 }));
