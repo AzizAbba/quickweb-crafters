@@ -25,7 +25,6 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     sourcemap: true,
     assetsDir: 'assets',
-    // Ensure proper MIME types for JavaScript modules
     rollupOptions: {
       output: {
         format: 'es',
