@@ -25,14 +25,7 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     sourcemap: true,
     assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-        inlineDynamicImports: false,
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]'
-      }
-    }
+    // Simplified build options without problematic manual configurations
+    emptyOutDir: true,
   },
 }));
